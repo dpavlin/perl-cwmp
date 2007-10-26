@@ -48,7 +48,7 @@ sub new {
 		)
 	);
 
-	foreach my $init ( qw/ state session / ) {
+	foreach my $init ( qw/ state / ) {
 		$self->db->put( $init => {} ) unless $self->db->get( $init );
 	}
 
@@ -155,6 +155,8 @@ for each CPE.
 
 =cut
 
+my $session;
+
 sub ID_to_uid {
 	my $self = shift;
 	my ( $ID, $state ) = @_;
@@ -163,15 +165,15 @@ sub ID_to_uid {
 
 	warn "ID_to_uid",dump( $ID, $state ),$/ if $self->debug;
 
-	$self->db->{session}->{ $ID }->{last_seen} = time();
+	$session->{ $ID }->{last_seen} = time();
 
 	my $uid;
 
-	if ( $uid = $self->db->{session}->{ $ID }->{ ID_to_uid } ) {
+	if ( $uid = $session->{ $ID }->{ ID_to_uid } ) {
 		return $uid;
 	} elsif ( $uid = $state->{DeviceID}->{SerialNumber} ) {
 		warn "## created new session for $uid session $ID\n" if $self->debug;
-		$self->db->{session}->{ $ID } = {
+		$session->{ $ID } = {
 			last_seen => time(),
 			ID_to_uid => $uid,
 		};
@@ -182,6 +184,8 @@ sub ID_to_uid {
 	}
 
 	# TODO: expire sessions longer than 30m
+
+	warn "current session = ",dump( $session );
 
 	return;
 }
