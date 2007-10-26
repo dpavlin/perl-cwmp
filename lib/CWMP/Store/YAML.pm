@@ -6,6 +6,7 @@ use warnings;
 
 use Data::Dump qw/dump/;
 use YAML qw/LoadFile DumpFile/;
+use Hash::Merge qw/merge/;
 
 =head1 NAME
 
@@ -44,7 +45,13 @@ sub update_uid_state {
 
 	my $file = "$dir/$uid.yml";
 
-	DumpFile( $file, $state ) || die "can't write $file: $!";
+	my $old_state = $self->get_state( $uid );
+
+	my $combined = merge( $state, $old_state );
+
+#	warn "## ",dump( $old_state, $state, $combined );
+
+	DumpFile( $file, $combined ) || die "can't write $file: $!";
 
 }
 

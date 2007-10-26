@@ -19,6 +19,8 @@ requires	'DBM::Deep';
 requires	'Getopt::Long';
 requires	'Term::Shelly'	=>	'0.03';
 requires	'Module::Pluggable';
+requires	'YAML';
+requires	'Hash::Merge';
 
 build_requires 'Test::More';
 
