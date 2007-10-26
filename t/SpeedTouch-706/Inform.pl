@@ -1,0 +1,28 @@
+{
+  CurrentTime => "1970-01-01T03:18:53Z",
+  DeviceID => {
+        Manufacturer => "THOMSON",
+        OUI => "00147F",
+        ProductClass => "SpeedTouch 706",
+        SerialNumber => "CP0636JT3SH",
+      },
+  EventStruct => ["2 PERIODIC"],
+  ID => "22_THOM_TR69_ID",
+  MaxEnvelopes => 2,
+  Parameter => {
+        ".ExternalIPAddress"                                              => "192.168.1.254",
+        "InternetGatewayDevice.DeviceInfo.HardwareVersion"                => "BANT-S",
+        "InternetGatewayDevice.DeviceInfo.ProvisioningCode"               => undef,
+        "InternetGatewayDevice.DeviceInfo.SoftwareVersion"                => "6.2.15.5",
+        "InternetGatewayDevice.DeviceInfo.SpecVersion"                    => "1.1",
+        "InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Date"        => "0000-00-00T00:00:00",
+        "InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Description" => "Factory Defaults",
+        "InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Name"        => "Routed PPPoE on 0/35 and 8/35",
+        "InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Version"     => undef,
+        "InternetGatewayDevice.DeviceSummary"                             => "InternetGatewayDevice:1.1[] (Baseline:1, EthernetLAN:1, ADSLWAN:1, Bridging:1, Time:1)",
+        "InternetGatewayDevice.ManagementServer.ConnectionRequestURL"     => "http://192.168.1.254:51005/",
+        "InternetGatewayDevice.ManagementServer.ParameterKey"             => undef,
+      },
+  RetryCount => 10,
+  _dispatch => "InformResponse",
+}

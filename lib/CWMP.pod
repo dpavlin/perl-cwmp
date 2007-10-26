@@ -1,0 +1,37 @@
+=head1 NAME
+
+CWMP - CPE WAN Management Protocol
+
+=head1 DESCRIPTION
+
+  CPE methods             Responding  Calling
+ 
+  GetRPCMethods           Required    Optional
+  SetParameterValues      Required    Required
+  GetParameterValues      Required    Required
+  GetParameterNames       Required    Required
+  SetParameterAttributes  Required    Optional
+  GetParameterAttributes  Required    Optional
+  AddObject               Required    Optional
+  DeleteObject            Required    Optional
+  Reboot                  Required    Optional
+  Download                Required    Required
+  Upload                  Optional    Optional
+  FactoryReset            Optional    Optional
+  GetQueuedTransfers      Optional    Optional
+  ScheduleInform          Optional    Optional
+  SetVouchers             Optional    Optional
+  GetOptions              Optional    Optional
+
+  Server methods   Calling    Responding
+ 
+  GetRPCMethods    Optional   Required
+  Inform           Required   Required
+  TransferComplete Required   Required
+  RequestDownload  Optional   Optional
+  Kicked           Optional   Optional
+
+
+=head1 AUTHOR
+
+Dobrica Pavlinusic, C<< dpavlin@rot13.org >>

@@ -1,0 +1,17 @@
+<soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+ <soapenv:Header>
+<cwmp:ID soapenv:mustUnderstand="1">22_THOM_TR69_ID</cwmp:ID>
+ </soapenv:Header>
+ <soapenv:Body>
+  <soapenv:Fault>
+   <faultcode>Client</faultcode>
+   <faultstring>CWMP fault</faultstring>
+   <detail>
+    <cwmp:Fault>
+     <FaultCode>9001</FaultCode>
+     <FaultString>Request Denied</FaultString>
+    </cwmp:Fault>
+   </detail>
+  </soapenv:Fault>
+ </soapenv:Body>
+</soapenv:Envelope>
