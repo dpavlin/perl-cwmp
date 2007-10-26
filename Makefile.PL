@@ -17,6 +17,8 @@ requires	'DBM::Deep';
 requires	'Getopt::Long';
 requires	'Term::Shelly'	=>	'0.03';
 
+build_requires 'Test::More';
+
 auto_install;
 
 WriteAll;
