@@ -102,7 +102,7 @@ sub process_request {
 	warn "<<<< ", $sock->peerhost, " [" . localtime() . "] ", $r->method, " ", $r->uri, " $size bytes\n";
 
 	if ( $self->debug > 2 ) {
-		my $file = sprintf("dump/%04d.request", $dump_nr++);
+		my $file = sprintf("dump/%04d-%s.request", $dump_nr++, $sock->peerhost);
 		write_file( $file, $r->as_string );
 		warn "### request dump: $file\n";
 	}
@@ -184,7 +184,7 @@ sub dispatch {
 		my $xml = $response->$dispatch( $self->state, @_ );
 		warn "## response payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
 		if ( $self->debug > 2 ) {
-			my $file = sprintf("dump/%04d.response", $dump_nr++);
+			my $file = sprintf("dump/%04d-%s.response", $dump_nr++, $self->sock->peerhost);
 			write_file( $file, $xml );
 			warn "### response dump: $file\n";
 		}
