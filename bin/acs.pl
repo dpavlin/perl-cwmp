@@ -21,7 +21,8 @@ GetOptions(
 my $server = CWMP::Server->new({
 	port => $port,
 	store => {
-		module => 'DBMDeep',
+#		module => 'DBMDeep',
+		module => 'YAML',
 		store_path => 'state.db',
 	},
 	debug => $debug,
