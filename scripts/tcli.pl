@@ -3,16 +3,35 @@
 use strict;
 use Expect;
 use Net::Telnet;
+use Data::Dump qw/dump/;
 
 my $modem = '10.0.0.138';
+$modem = shift @ARGV if $#ARGV > 1;
+
 my @commands = (
 ':system config led=flash',
 );
 
+warn "ARGV = ",dump( $ARGV );
+
+sub ask {
+	my ( $prompt, $default ) = @_;
+	warn "## ask $prompt [default]";
+	print "$prompt [$default] ";
+	my $in = <STDIN>;
+	chomp($in);
+	$in = $default unless length($in) > 1;
+	return $in;
+}
+
 while(<>) {
 	chomp;
 	next if (/^#/ || /^\s*$/);
-	push @commands, $_;
+	my $l = $_;
+	warn "--$_--";
+	$l =~ s/ask\(([^|\)]+)(?:\|([^\)]+))?\)/ask($1,$2)/eg;
+	warn "++ $l\n";
+	push @commands, $l;
 }
 
 push @commands, ':system config led=off';

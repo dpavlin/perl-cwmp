@@ -1,4 +1,4 @@
-:ip ipadd intf=LocalNetwork addr=192.168.1.242
+:ip ipadd intf=LocalNetwork addr=ask(New IP:|192.168.1.250)
 :ip iplist
 :ip ipdelete addr=192.168.1.254
 :ip iplist
