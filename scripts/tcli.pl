@@ -4,7 +4,7 @@ use strict;
 use Expect;
 use Net::Telnet;
 
-my $modem = '192.168.1.254';
+my $modem = '10.0.0.138';
 my @commands = (
 ':system config led=flash',
 );

@@ -1,0 +1,25 @@
+This is small collection of useful scripts and configuration
+to get you started.
+
+Premise is simple: you have several modems connected to eth0
+and you are using some other device (e.g. wifi, other network card) to
+connect to internet.
+
+We will configure two networks:
+
+192.168.1.240/28
+10.0.0.0/8
+
+First one is to accomodate Thompson's default setting of 192.168.1.254.
+
+Even if your internet connection uses gateway on 192.168.1.1 it will still
+work unless you are using IP addresses over 192.168.1.240.
+
+Then execute:
+
+./net.sh
+
+or with some other network device:
+
+./net.sh eth1
+
