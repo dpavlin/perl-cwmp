@@ -18,6 +18,7 @@ requires	'File::Slurp';
 requires	'DBM::Deep';
 requires	'Getopt::Long';
 requires	'Term::Shelly'	=>	'0.03';
+requires	'Module::Pluggable';
 
 build_requires 'Test::More';
 
