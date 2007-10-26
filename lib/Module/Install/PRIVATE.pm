@@ -26,6 +26,7 @@ sub my_targets {
 # --- $self section:
 
 dump: all
+	rm dump/* || true
 	./bin/acs.pl -d -d -d 2>&1 | tee log
 
 END_MAKEFILE

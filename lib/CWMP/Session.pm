@@ -102,7 +102,7 @@ sub process_request {
 	warn "<<<< ", $sock->peerhost, " [" . localtime() . "] ", $r->method, " ", $r->uri, " $size bytes\n";
 
 	if ( $self->debug > 2 ) {
-		my $file = sprintf("dump/%04d.request", $dump_nr);
+		my $file = sprintf("dump/%04d.request", $dump_nr++);
 		write_file( $file, $r->as_string );
 		warn "### request dump: $file\n";
 	}
