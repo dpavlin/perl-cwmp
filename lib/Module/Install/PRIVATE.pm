@@ -25,12 +25,12 @@ sub my_targets {
 	$self->postamble(<<"END_MAKEFILE");
 # --- $self section:
 
-debug:
+dump: all
 	./bin/acs.pl -d -d -d 2>&1 | tee log
 
 END_MAKEFILE
 
-	warn "added my targets\n";
+	warn "added my targets: dump\n";
 
 	return $self;
 }

@@ -22,6 +22,7 @@ requires	'Term::Shelly'	=>	'0.03';
 build_requires 'Test::More';
 
 my_targets();
+clean_files('dump/*');
 
 auto_install;
 

@@ -68,7 +68,7 @@ facilitate brain-dead concept of adding state to stateless protocol like
 HTTP.
 
 If used with debugging level of 3 or more, it will also create dumps of
-requests named C<< nr.dump >> where C<nr> is number from 0 to total number
+requests named C<< dump/nr.request >> where C<nr> is number from 0 to total number
 of requests in single session.
 
 =cut
@@ -102,7 +102,7 @@ sub process_request {
 	warn "<<<< ", $sock->peerhost, " [" . localtime() . "] ", $r->method, " ", $r->uri, " $size bytes\n";
 
 	if ( $self->debug > 2 ) {
-		my $file = $dump_nr++ . '.dump';
+		my $file = sprintf("dump/%04d.request", $dump_nr);
 		write_file( $file, $r->as_string );
 		warn "### request dump: $file\n";
 	}
@@ -172,6 +172,8 @@ sub process_request {
 
   $xml = $self->dispatch('Inform', $response_arguments );
 
+If debugging level of 3 or more, it will create dumps of responses named C<< dump/nr.response >>
+
 =cut
 
 sub dispatch {
@@ -185,6 +187,11 @@ sub dispatch {
 		warn ">>> dispatching to $dispatch\n";
 		my $xml = $response->$dispatch( $self->state, @_ );
 		warn "## response payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
+		if ( $self->debug > 2 ) {
+			my $file = sprintf("dump/%04d.response", $dump_nr++);
+			write_file( $file, $xml );
+			warn "### response dump: $file\n";
+		}
 		return $xml;
 	} else {
 		confess "can't dispatch to $dispatch";
