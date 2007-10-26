@@ -1,3 +1,5 @@
+use lib './lib';
+
 use inc::Module::Install;
 
 name		'CWMP';
@@ -19,6 +21,9 @@ requires	'Term::Shelly'	=>	'0.03';
 
 build_requires 'Test::More';
 
+my_targets();
+
 auto_install;
 
 WriteAll;
+
