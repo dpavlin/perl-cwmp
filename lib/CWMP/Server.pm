@@ -7,7 +7,7 @@ use warnings;
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 port
-store_path
+store
 default_queue
 background
 debug
@@ -30,7 +30,7 @@ CWMP::Server - description
 
   my $server = CWMP::Server->new({
   	port => 3333,
-	store_path => 'state.db',
+	store => 'state.db',
 	default_queue => [ qw/GetRPCMethods GetParameterNames/ ],                                                           
 	background => 1,
 	debug => 1
@@ -44,9 +44,10 @@ Options:
 
 port to listen on
 
-=item store_path
+=item store
 
-path to L<DBM::Deep> database file to preserve state
+hash with key C<module> with value C<DBMDeep> if L<CWMP::Store::DBMDeep>
+is used. Other parametars are optional.
 
 =item default_queue
 
@@ -72,7 +73,7 @@ sub new {
 			proto => 'tcp',
 			port => $self->port,
 			default_queue => $self->default_queue,
-			store_path => $self->store_path,
+			store => $self->store,
 			debug => $self->debug,
 			background => $self->background,
 		})
@@ -109,7 +110,7 @@ sub options {
 	$self->SUPER::options($template);
 
 	# new single-value options
-	foreach my $p ( qw/ store_path debug / ) {
+	foreach my $p ( qw/ store debug / ) {
 		$prop->{ $p } ||= undef;
 		$template->{ $p } = \$prop->{ $p };
 	}
@@ -139,7 +140,7 @@ sub process_request {
 	my $session = CWMP::Session->new({
 		sock => $sock,
 		queue => $prop->{default_queue},
-		store_path => $prop->{store_path},
+		store => $prop->{store},
 		debug => $prop->{debug},
 	}) || confess "can't create session";
 

@@ -4,13 +4,14 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use lib 'lib';
 
 BEGIN {
 	use_ok('CWMP::Store');
+	use_ok('CWMP::Store::DBMDeep');
 }
 
 ok(my $abs_path = abs_path($0), "abs_path");
@@ -22,6 +23,7 @@ unlink $path if -e $path;
 
 ok( my $store = CWMP::Store->new({
 	debug => $debug,
+	module => 'DBMDeep',
 	path => $path,
 }), 'new' );
 isa_ok( $store, 'CWMP::Store' );
