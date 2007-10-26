@@ -113,23 +113,19 @@ sub process_request {
 
 		die "no SOAPAction header in ",dump($chunk) unless defined ( $r->header('SOAPAction') );
 
+		$state = CWMP::Request->parse( $chunk );
 
-		if ( $chunk ) {
-			warn "## request chunk: ",length($chunk)," bytes\n$chunk\n" if $self->debug;
+		warn "## acquired state = ", dump( $state ), "\n";
 
-			$state = CWMP::Request->parse( $chunk );
-
-			warn "## acquired state = ", dump( $state ), "\n";
-
-			$self->state( $state );
-			$self->store->update_state( ID => $state->{ID}, $state );
-
-		} else {
-			warn "## empty request\n";
-		}
+		$self->state( $state );
+		$self->store->update_state( ID => $state->{ID}, $state );
 
 	} else {
+
+		warn "## empty request\n";
+
 		$state = $self->state;
+		delete( $state->{_dispatch} );
 		warn "last request state = ", dump( $state ), "\n" if $self->debug > 1;
 	}
 
