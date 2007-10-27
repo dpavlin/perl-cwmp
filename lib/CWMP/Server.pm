@@ -30,7 +30,10 @@ CWMP::Server - description
 
   my $server = CWMP::Server->new({
   	port => 3333,
-	store => 'state.db',
+	store => {
+		module => 'DBMDeep',
+		path => 'var/',
+	},
 	default_queue => [ qw/GetRPCMethods GetParameterNames/ ],                                                           
 	background => 1,
 	debug => 1
