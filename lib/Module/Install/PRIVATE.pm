@@ -29,6 +29,10 @@ dump: all
 	rm dump/* || true
 	./bin/acs.pl -d -d -d 2>&1 | tee log
 
+html: \$(MAN1PODS) \$(MAN3PODS)
+	test -d html || mkdir html
+	allpod2xhtml.pl lib/ html/
+
 END_MAKEFILE
 
 	warn "added my targets: dump\n";
