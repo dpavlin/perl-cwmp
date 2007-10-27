@@ -17,7 +17,7 @@ BEGIN {
 ok(my $abs_path = abs_path($0), "abs_path");
 $abs_path =~ s!/[^/]*$!/!;	#!fix-vim
 
-my $path = "$abs_path/var/state.db";
+my $path = "$abs_path/var/";
 
 unlink $path if -e $path;
 
