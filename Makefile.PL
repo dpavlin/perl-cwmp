@@ -26,7 +26,7 @@ build_requires 'Test::More';
 
 my_targets();
 
-clean_files('dump/* yaml state.db');
+clean_files('dump/* yaml state.db html');
 
 auto_install;
 
