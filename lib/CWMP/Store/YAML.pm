@@ -17,11 +17,17 @@ CWMP::Store::YAML - use YAML as storage
 
 =head2 open
 
+  $store->open({
+	path => 'var/',
+	debug => 1,
+	clean => 1,
+  });
+
 =cut
 
 my $path;
 
-my $debug = 1;
+my $debug = 0;
 
 sub open {
 	my $self = shift;
@@ -37,8 +43,15 @@ sub open {
 
 	if ( ! -e $path ) {
 		mkdir $path || die "can't create $path: $!";
-		warn "created $path directory\n";
+		warn "created $path directory\n" if $debug;
+	} elsif ( $args->{clean} ) {
+		warn "removed old $path\n" if $debug;
+		foreach my $uid ( $self->all_uids ) {
+			my $file = "$path/$uid.yml";
+			unlink $file || die "can't remove $file: $!";
+		}
 	}
+
 
 }
 

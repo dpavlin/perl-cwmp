@@ -3,7 +3,7 @@ use lib './lib';
 use inc::Module::Install;
 
 name		'CWMP';
-version		'0.04';
+version		'0.05';
 license		'GPL';
 requires	'Net::Server';
 requires	'HTTP::Daemon';
@@ -26,7 +26,7 @@ build_requires 'Test::More';
 
 my_targets();
 
-clean_files('dump/* yaml state.db html');
+clean_files('dump/* yaml state.db html t/var/*');
 
 auto_install;
 
