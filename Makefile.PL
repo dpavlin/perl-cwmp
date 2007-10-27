@@ -25,6 +25,7 @@ requires	'Hash::Merge';
 build_requires 'Test::More';
 
 my_targets();
+
 clean_files('dump/* yaml state.db');
 
 auto_install;

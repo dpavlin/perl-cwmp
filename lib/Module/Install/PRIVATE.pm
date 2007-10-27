@@ -15,7 +15,7 @@ Module::Install::PRIVATE - Module Install Support
 
 =head1 DESCRIPTION
 
-=head2 html_target
+=head2 my_targets
 
 =cut
 
