@@ -79,7 +79,7 @@ sub all_uids {
 	my @uids = grep { /\.yml$/ && -f "$dir/$_" } readdir($d);
 	closedir $d;
 
-	return map { s/\.yml$// } @uids;
+	return map { my $l = $_; $l =~ s/\.yml$//; $l } @uids;
 }
 
 1;
