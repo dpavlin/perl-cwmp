@@ -16,11 +16,17 @@ CWMP::Store::DBMDeep - use DBM::Deep as storage
 
 =head2 open
 
+  $store->open({
+	path => 'var/',
+	debug => 1,
+	clean => 1,
+  });
+
 =cut
 
 my $db;
 
-my $debug = 1;
+my $debug = 0;
 
 sub open {
 	my $self = shift;
@@ -33,6 +39,11 @@ sub open {
 	warn "open ",dump( $args ) if $debug;
 
 	$path = "$path/state.db" if ( -d $args->{path} );
+
+	if ( $args->{clean} && -e $path ) {
+		warn "removed old $path\n";
+		unlink $path || die "can't remove $path: $!";
+	}
 
 	$db = DBM::Deep->new(
 		file => $path,

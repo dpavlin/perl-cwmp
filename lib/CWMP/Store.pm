@@ -27,6 +27,7 @@ CWMP::Store - parsist CPE state on disk
   my $store = CWMP::Store->new({
   	module => 'DBMDeep',
   	path => '/path/to/state.db',
+	clean => 1,
 	debug => 1,
   });
 
@@ -38,9 +39,10 @@ sub new {
 
 	confess "requed parametar module is missing" unless $self->module;
 
-	warn "created ", __PACKAGE__, "(", dump( @_ ), ") object\n" if $self->debug;
+	# XXX it's important to call possible_stores once, because current_store won't work
+	my @plugins = $self->possible_stores();
 
-	warn "Found store plugins: ", join(", ", __PACKAGE__->possible_stores() );
+	warn "Found store plugins: ", join(", ", @plugins ), "\n" if $self->debug;
 
 	$self->current_store->open( @_ );
 
@@ -61,7 +63,7 @@ sub current_store {
 
 	confess "unknown store module $module not one of ", dump( $self->possible_stores ) unless $s;
 
-	warn "current store = ",dump( $s );
+	warn "## current store = $s\n" if $self->debug;
 
 	return $s;
 }
@@ -100,22 +102,22 @@ sub update_state {
 	$self->current_store->update_uid_state( $uid, $state );
 }
 
-=head2 state
+=head2 get_state
 
-  my $state = $store->state( ID => $ID );
-  my $state = $store->state( uid => $uid );
+  my $state = $store->get_state( ID => $ID );
+  my $state = $store->get_state( uid => $uid );
 
 Returns normal unblessed hash (actually, in-memory copy of state in database).
 
 =cut
 
-sub state {
+sub get_state {
 	my $self = shift;
 	my ( $k, $v ) = @_;
 	confess "need ID or uid" unless $k =~ m/^(ID|uid)$/;
 	confess "need $k value" unless $v;
 
-	warn "## state( $k => $v )\n" if $self->debug;
+	warn "## get_state( $k => $v )\n" if $self->debug;
 
 	my $uid;
 
@@ -134,16 +136,16 @@ sub state {
 
 }
 
-=head2 known_CPE
+=head2 all_uids
 
-  my @cpe = $store->known_CPE;
+  my @cpe = $store->all_uids;
 
 =cut
 
-sub known_CPE {
+sub all_uids {
 	my $self = shift;
 	my @cpes = $self->current_store->all_uids;
-	warn "all CPE: ", dump( @cpes ), "\n" if $self->debug;
+	warn "## all_uids = ", dump( @cpes ), "\n" if $self->debug;
 	return @cpes;
 }
 
