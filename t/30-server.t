@@ -25,13 +25,18 @@ eval {
 ok(my $abs_path = abs_path($0), "abs_path");
 $abs_path =~ s!/[^/]*$!/!;	#!fix-vim
 
-my $store_path = "$abs_path/var/state.db";
-unlink $store_path if -e $store_path;
+my $store_path = "$abs_path/var/";
+#my $store_module = 'DBMDeep';
+my $store_module = 'YAML';
 
 ok( my $server = CWMP::Server->new({
 	debug => $debug,
 	port => $port,
-	store_path => $store_path,
+	store => {
+		module => $store_module,
+		path => $store_path,
+		clean => 1,
+	},
 }), 'new' );
 isa_ok( $server, 'CWMP::Server' );
 
@@ -152,7 +157,7 @@ ok( $s->write_chunk_eof, 'write_chunk_eof' );
 
 sleep 1;
 
-ok( my $store = CWMP::Store->new({ path => $store_path, debug => $debug }), 'another store' );
+ok( my $store = CWMP::Store->new({ module => $store_module, path => $store_path, debug => $debug }), 'another store' );
 
 my $state = {
   CurrentTime    => "1970-01-01T00:04:33Z",
@@ -184,7 +189,7 @@ my $state = {
   _dispatch      => "InformResponse",
 };
 
-is_deeply( $store->state( ID => '1_THOM_TR69_ID' ), $state, 'new store->state' );
+is_deeply( $store->get_state( ID => '1_THOM_TR69_ID' ), $state, 'new store->get_state' );
 
 ok( kill(9,$pid), 'kill ' . $pid );
 
