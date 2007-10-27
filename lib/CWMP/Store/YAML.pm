@@ -7,6 +7,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use YAML qw/LoadFile DumpFile/;
 use Hash::Merge qw/merge/;
+use Carp qw/confess/;
 
 =head1 NAME
 
@@ -18,18 +19,25 @@ CWMP::Store::YAML - use YAML as storage
 
 =cut
 
-my $dir = 'yaml';
+my $path;
 
 my $debug = 1;
 
 sub open {
 	my $self = shift;
 
-	warn "open ",dump( @_ );
+	my $args = shift;
 
-	if ( ! -e $dir ) {
-		mkdir $dir || die "can't create $dir: $!";
-		warn "created $dir directory\n";
+	$debug = $args->{debug};
+	$path = $args->{path} || confess "no path?";
+
+	warn "open ",dump( $args ) if $debug;
+
+	$path = "$path/yaml";
+
+	if ( ! -e $path ) {
+		mkdir $path || die "can't create $path: $!";
+		warn "created $path directory\n";
 	}
 
 }
@@ -43,7 +51,7 @@ sub open {
 sub update_uid_state {
 	my ( $self, $uid, $state ) = @_;
 
-	my $file = "$dir/$uid.yml";
+	my $file = "$path/$uid.yml";
 
 	my $old_state = $self->get_state( $uid );
 
@@ -64,7 +72,7 @@ sub update_uid_state {
 sub get_state {
 	my ( $self, $uid ) = @_;
 
-	my $file = "$dir/$uid.yml";
+	my $file = "$path/$uid.yml";
 
 	if ( -e $file ) {
 		return LoadFile( $file );
@@ -82,8 +90,8 @@ sub get_state {
 sub all_uids {
 	my $self = shift;
 
-	opendir(my $d, $dir) || die "can't opendir $dir: $!";
-	my @uids = grep { /\.yml$/ && -f "$dir/$_" } readdir($d);
+	opendir(my $d, $path) || die "can't opendir $path: $!";
+	my @uids = grep { /\.yml$/ && -f "$path/$_" } readdir($d);
 	closedir $d;
 
 	return map { my $l = $_; $l =~ s/\.yml$//; $l } @uids;

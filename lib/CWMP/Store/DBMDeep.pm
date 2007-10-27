@@ -6,6 +6,7 @@ use warnings;
 
 use DBM::Deep;
 use Data::Dump qw/dump/;
+use Carp qw/confess/;
 
 =head1 NAME
 
@@ -24,15 +25,20 @@ my $debug = 1;
 sub open {
 	my $self = shift;
 
-	warn "open ",dump( @_ );
+	my $args = shift;
 
-	my $path = 'state.db';
+	$debug = $args->{debug};
+	my $path = $args->{path} || confess "no path?";
+
+	warn "open ",dump( $args ) if $debug;
+
+	$path = "$path/state.db" if ( -d $args->{path} );
 
 	$db = DBM::Deep->new(
 		file => $path,
 		locking => 1,
 		autoflush => 1,
-	);
+	) || confess "can't open $path: $!";
 
 }
 
