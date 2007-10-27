@@ -12,18 +12,22 @@ use Getopt::Long;
 
 my $port = 3333;
 my $debug = 0;
+my $store_path = './';
+my $store_plugin = 'YAML';
 
 GetOptions(
 	'debug+' => \$debug,
 	'port=i' => \$port,
+	'store-path=s' => \$store_path,
+	'store-plugin=s' => \$store_plugin,
 );
 
 my $server = CWMP::Server->new({
 	port => $port,
 	store => {
-#		module => 'DBMDeep',
-		module => 'YAML',
-		store_path => 'state.db',
+		module => $store_plugin,
+		path => $store_path,
+		debug => $debug,
 	},
 	debug => $debug,
 	default_queue => [ qw/

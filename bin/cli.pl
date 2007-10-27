@@ -14,19 +14,22 @@ use Getopt::Long;
 use Carp qw/confess/;
 
 my $debug = 0;
-my $store_path = 'state.db';
+my $store_path = './';
+my $store_plugin = 'YAML';
 
 GetOptions(
 	'debug+' => \$debug,
 	'store-path=s' => \$store_path,
+	'store-plugin=s' => \$store_plugin,
 );
 
 my $sh = Term::Shelly->new();
 my $tree = CWMP::Tree->new({ debug => $debug });
 
 our $store = CWMP::Store->new({
-	debug => $debug,
+	module => $store_plugin,
 	path => $store_path,
+	debug => $debug,
 });
 
 $sh->out(
@@ -77,7 +80,7 @@ sub completer {
 
 	# do we have list (part) of CPE?
 	if ( $line =~ /^(\S*)\s*$/ ) {
-		@matches = sort grep { /^\Q$curword\E/ } $store->known_CPE;
+		@matches = sort grep { /^\Q$curword\E/ } $store->all_uids;
 		$sh->out( "CPE available: ", join(",", @matches ) );
 	} elsif ( $line =~ /^(\w+)\s+(\S+)$/ ) {
 		$sh->out("finding completes for '$2'");
