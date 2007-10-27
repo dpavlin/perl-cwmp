@@ -136,15 +136,21 @@ sub process_request {
 
 	warn "default CPE queue ( " . join(",",@{$prop->{default_queue}}) . " )\n" if defined($prop->{default_queue});
 
-	my $session = CWMP::Session->new({
-		sock => $sock,
-		queue => $prop->{default_queue},
-		store_path => $prop->{store_path},
-		debug => $prop->{debug},
-	}) || confess "can't create session";
+	eval  {
+		my $session = CWMP::Session->new({
+			sock => $sock,
+			queue => $prop->{default_queue},
+			store_path => $prop->{store_path},
+			debug => $prop->{debug},
+		}) || confess "can't create session";
 
-	while ( $session->process_request ) {
-		warn "...another one bites the dust...\n";
+		while ( $session->process_request ) {
+			warn "...another one bites the dust...\n";
+		}
+	};
+
+	if ($@) {
+		warn $@;
 	}
 
 	warn "...returning to accepting new connections\n";

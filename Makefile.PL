@@ -27,4 +27,3 @@ clean_files('dump/*');
 auto_install;
 
 WriteAll;
-

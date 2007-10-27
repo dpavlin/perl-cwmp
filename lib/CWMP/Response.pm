@@ -101,6 +101,27 @@ sub GetParameterNames {
 	});
 }
 
+=head2 GetParameterValues {
+
+  $response->GetParameterValues( $state, $ParameterPath, $NextLevel );
+
+=cut
+
+sub GetParameterValues {
+	my ( $self, $state, $ParameterPath, $NextLevel ) = @_;
+	$ParameterPath ||= '';	# all
+	$NextLevel ||= 0;		# all
+	warn "# GetParameterValues( '$ParameterPath', $NextLevel )\n" if $self->debug;
+	$self->xml( $state, sub {
+		my ( $X, $state ) = @_;
+
+		$X->GetParameterValues( $cwmp,
+			$X->ParameterPath( $cwmp, $ParameterPath ),
+			$X->NextLevel( $cwmp, $NextLevel ),
+		);
+	});
+}
+
 =head2 xml
 
 Used to implement methods which modify just body of soap message.
