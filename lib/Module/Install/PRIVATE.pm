@@ -31,7 +31,7 @@ dump: all
 
 html: \$(MAN1PODS) \$(MAN3PODS)
 	test -d html || mkdir html
-	allpod2xhtml.pl lib/ html/
+	allpod2xhtml.pl --frames="Perl CWMP server" lib/ html/
 
 END_MAKEFILE
 
