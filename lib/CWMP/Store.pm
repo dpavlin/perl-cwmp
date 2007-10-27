@@ -7,15 +7,14 @@ use warnings;
 
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
-debug
+module
 path
-
-db
+debug
 / );
 
 use Carp qw/confess/;
 use Data::Dump qw/dump/;
-use DBM::Deep;
+use Module::Pluggable search_path => 'CWMP::Store', sub_name => 'possible_stores', require => 1;
 
 =head1 NAME
 
@@ -26,6 +25,7 @@ CWMP::Store - parsist CPE state on disk
 =head2 new
 
   my $store = CWMP::Store->new({
+  	module => 'DBMDeep',
   	path => '/path/to/state.db',
 	debug => 1,
   });
@@ -36,23 +36,34 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new( @_ );
 
+	confess "requed parametar module is missing" unless $self->module;
+
 	warn "created ", __PACKAGE__, "(", dump( @_ ), ") object\n" if $self->debug;
 
-	confess "need path to state.db" unless ( $self->path );
+	warn "Found store plugins: ", join(", ", __PACKAGE__->possible_stores() );
 
-	$self->db(
-		DBM::Deep->new(
-			file => $self->path,
-			locking => 1,
-			autoflush => 1,
-		)
-	);
-
-	foreach my $init ( qw/ state / ) {
-		$self->db->put( $init => {} ) unless $self->db->get( $init );
-	}
+	$self->current_store->open( @_ );
 
 	return $self;
+}
+
+=head2 current_store
+
+Returns currnet store plugin object
+
+=cut
+
+sub current_store {
+	my $self = shift;
+
+	my $module = $self->module;
+	my $s = $self->only( ref($self).'::'.$module );
+
+	confess "unknown store module $module not one of ", dump( $self->possible_stores ) unless $s;
+
+	warn "current store = ",dump( $s );
+
+	return $s;
 }
 
 =head2 update_state
@@ -86,13 +97,7 @@ sub update_state {
 		$uid = $v;
 	}
 
-	if ( my $o = $self->db->get('state')->get( $uid ) ) {
-		warn "## update state of $uid [$v]\n" if $self->debug;
-		return $o->import( $state );
-	} else {
-		warn "## create new state for $uid [$v]\n" if $self->debug;
-		return $self->db->get('state')->put( $uid => $state );
-	}
+	$self->current_store->update_uid_state( $uid, $state );
 }
 
 =head2 state
@@ -125,11 +130,7 @@ sub state {
 		$uid = $v;
 	}
 
-	if ( my $state = $self->db->get('state')->get( $uid ) ) {
-		return $state->export;
-	} else {
-		return;
-	}
+	return $self->current_store->get_state( $uid );
 
 }
 
@@ -141,7 +142,7 @@ sub state {
 
 sub known_CPE {
 	my $self = shift;
-	my @cpes = keys %{ $self->db->{state} };
+	my @cpes = $self->current_store->all_uids;
 	warn "all CPE: ", dump( @cpes ), "\n" if $self->debug;
 	return @cpes;
 }

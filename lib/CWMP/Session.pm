@@ -7,7 +7,7 @@ use warnings;
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 debug
-store_path
+store
 
 sock
 state
@@ -34,7 +34,7 @@ CWMP::Session - implement logic of CWMP protocol
 
   my $server = CWMP::Session->new({
 	sock => $io_socket_object,
-	store_path => 'state.db',
+	store => 'state.db',
 	queue => [ qw/GetRPCMethods GetParameterNames/ ],
 	debug => 1,
   });
@@ -51,12 +51,15 @@ sub new {
 
 	warn "created ", __PACKAGE__, "(", dump( @_ ), ") for ", $self->sock->peerhost, "\n" if $self->debug;
 
-	$self->store( CWMP::Store->new({
+	my $store_obj = CWMP::Store->new({
 		debug => $self->debug,
-		path => $self->store_path,
-	}) );
+		%{ $self->store },
+	});
 
-	croak "can't open ", $self->store_path, ": $!" unless $self->store;
+	croak "can't open ", dump( $self->store ), ": $!" unless $store_obj;
+
+	# FIXME looks ugly. Should we have separate accessor for this?
+	$self->store( $store_obj );
 
 	return $self;
 }
@@ -122,11 +125,11 @@ sub process_request {
 
 	} else {
 
-		warn "## empty request\n";
+		warn "## empty request, using last request state\n";
 
 		$state = $self->state;
 		delete( $state->{_dispatch} );
-		warn "last request state = ", dump( $state ), "\n" if $self->debug > 1;
+		#warn "last request state = ", dump( $state ), "\n" if $self->debug > 1;
 	}
 
 
@@ -146,7 +149,7 @@ sub process_request {
 	} elsif ( $dispatch = shift @{ $self->queue } ) {
 		$xml = $self->dispatch( $dispatch );
 	} elsif ( $size == 0 ) {
-		warn ">>> closing connection\n";
+		warn ">>> no more queued commands, closing connection\n";
 		return 0;
 	} else {
 		warn ">>> empty response\n";

@@ -12,17 +12,18 @@ use Getopt::Long;
 
 my $port = 3333;
 my $debug = 0;
-my $store_path = 'state.db';
 
 GetOptions(
 	'debug+' => \$debug,
 	'port=i' => \$port,
-	'store-path=s' => \$store_path,
 );
 
 my $server = CWMP::Server->new({
 	port => $port,
-	store_path => $store_path,
+	store => {
+		module => 'DBMDeep',
+		store_path => 'state.db',
+	},
 	debug => $debug,
 	default_queue => [ qw/
 		GetRPCMethods
