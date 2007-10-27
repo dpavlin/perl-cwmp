@@ -23,7 +23,8 @@ unlink $path if -e $path;
 
 ok( my $store = CWMP::Store->new({
 	debug => $debug,
-	module => 'DBMDeep',
+#	module => 'DBMDeep',
+	module => 'YAML',
 	path => $path,
 }), 'new' );
 isa_ok( $store, 'CWMP::Store' );
