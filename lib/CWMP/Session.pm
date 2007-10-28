@@ -21,7 +21,7 @@ use Carp qw/confess cluck croak/;
 use File::Slurp;
 
 use CWMP::Request;
-use CWMP::Response;
+use CWMP::Methods;
 use CWMP::Store;
 
 =head1 NAME
@@ -192,7 +192,7 @@ sub dispatch {
 		push @args, @a;
 	}
 
-	my $response = CWMP::Response->new({ debug => $self->debug });
+	my $response = CWMP::Methods->new({ debug => $self->debug });
 
 	if ( $response->can( $dispatch ) ) {
 		warn ">>> dispatching to $dispatch\n";

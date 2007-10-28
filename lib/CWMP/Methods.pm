@@ -1,4 +1,4 @@
-package CWMP::Response;
+package CWMP::Methods;
 
 use strict;
 use warnings;
@@ -13,13 +13,13 @@ use Data::Dump qw/dump/;
 
 =head1 NAME
 
-CWMP::Response - generate SOAP meesage for response
+CWMP::Methods - generate SOAP meesages for CPE
 
 =head2 METHODS
 
 =head2 new
 
-  my $response = CWMP::Response->new({ debug => 1 });
+  my $response = CWMP::Methods->new({ debug => 1 });
 
 =cut
 

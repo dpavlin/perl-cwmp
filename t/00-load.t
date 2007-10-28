@@ -10,7 +10,7 @@ use blib;
 BEGIN {
 	use_ok('CWMP::Server');
 	use_ok('CWMP::Request');
-	use_ok('CWMP::Response');
+	use_ok('CWMP::Methods');
 	use_ok('CWMP::Store');
 }
 

@@ -4,6 +4,15 @@ CWMP - CPE WAN Management Protocol
 
 =head1 DESCRIPTION
 
+This is free, open source implementation of
+
+DSL Forum: TR-069 - CPE WAN Management Protocol, May 2004
+
+In essence, it's relaxed SOAP server which eats garbage and tries to produce
+standard compliant results.
+
+Standard defines following methods:
+
   CPE methods             Responding  Calling
  
   GetRPCMethods           Required    Optional
@@ -31,6 +40,8 @@ CWMP - CPE WAN Management Protocol
   RequestDownload  Optional   Optional
   Kicked           Optional   Optional
 
+
+To see implemented methods take a look in L<CWMP::Methods>
 
 =head1 AUTHOR
 

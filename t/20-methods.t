@@ -11,14 +11,14 @@ use File::Slurp;
 use blib;
 
 BEGIN {
-	use_ok('CWMP::Response');
+	use_ok('CWMP::Methods');
 }
 
 ok(my $abs_path = abs_path($0), "abs_path");
 $abs_path =~ s!/[^/]*$!/!;	#!fix-vim
 
-ok( my $response = CWMP::Response->new({ debug => $debug }), 'new' );
-isa_ok( $response, 'CWMP::Response' );
+ok( my $response = CWMP::Methods->new({ debug => $debug }), 'new' );
+isa_ok( $response, 'CWMP::Methods' );
 
 sub check_response {
 	my $command = shift || die "no command?";
