@@ -147,7 +147,7 @@ sub process_request {
 
 	$sock->send( "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" ) if ( $state->{ID} );
 	
-	my $xml = '';
+	$xml = '';
 
 	if ( my $dispatch = $state->{_dispatch} ) {
 		$xml = $self->dispatch( $dispatch );

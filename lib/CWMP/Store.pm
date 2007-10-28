@@ -46,6 +46,9 @@ sub new {
 
 	$self->current_store->open( @_ );
 
+	# so that we don't have to check if it's defined
+	$self->debug( 0 ) unless $self->debug;
+
 	return $self;
 }
 
