@@ -170,7 +170,7 @@ my $state = {
   EventStruct    => ["0 BOOTSTRAP", "1 BOOT", "4 VALUE CHANGE"],
   ID             => "1_THOM_TR69_ID",
   MaxEnvelopes   => 2,
-  NoMoreRequests => undef,
+#  NoMoreRequests => undef,
   Parameter      => {
                       "\nInternetGatewayDevice.DeviceInfo.SpecVersion"                  => "1.1",
                       ".ExternalIPAddress"                                              => "192.168.1.254",
@@ -189,7 +189,7 @@ my $state = {
   _dispatch      => "InformResponse",
 };
 
-is_deeply( $store->get_state( ID => '1_THOM_TR69_ID' ), $state, 'new store->get_state' );
+is_deeply( $store->current_store->get_state( 'CP0644JTHJ4' ), $state, 'store->current_store->get_state' );
 
 ok( kill(9,$pid), 'kill ' . $pid );
 
