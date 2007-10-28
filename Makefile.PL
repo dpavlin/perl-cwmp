@@ -17,7 +17,7 @@ requires	'Cwd';
 requires	'File::Slurp';
 requires	'DBM::Deep';
 requires	'Getopt::Long';
-requires	'Term::Shelly'	=>	'0.03';
+#requires	'Term::Shelly'	=>	'0.03';
 requires	'Module::Pluggable';
 requires	'YAML';
 requires	'Hash::Merge';
