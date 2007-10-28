@@ -23,7 +23,11 @@ isa_ok( $response, 'CWMP::Response' );
 sub check_response {
 	my $command = shift || die "no command?";
 
-	ok( my $xml = $response->$command({ ID => 42 }), "generate response for $command" );
+	my $state = {
+		ID => 42,
+	};
+
+	ok( my $xml = $response->$command( $state, @_ ), "generate response $command" . dump(@_) );
 
 	my $file = "$abs_path/response/$command.xml";
 
@@ -40,5 +44,5 @@ sub check_response {
 check_response( 'InformResponse' );
 check_response( 'GetRPCMethods' );
 check_response( 'Reboot' );
-check_response( 'GetParameterNames' );
+check_response( 'GetParameterNames', 'InternetGatewayDevice.DeviceInfo.SerialNumber', 0 );
 check_response( 'GetParameterValues' );

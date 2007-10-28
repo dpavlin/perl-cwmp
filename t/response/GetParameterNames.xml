@@ -7,7 +7,7 @@
   </soap:Header>
   <soap:Body>
     <cwmp:GetParameterNames>
-      <cwmp:ParameterPath></cwmp:ParameterPath>
+      <cwmp:ParameterPath>InternetGatewayDevice.DeviceInfo.SerialNumber</cwmp:ParameterPath>
       <cwmp:NextLevel>0</cwmp:NextLevel>
     </cwmp:GetParameterNames>
   </soap:Body>
