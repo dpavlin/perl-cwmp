@@ -107,8 +107,10 @@ sub process_request {
 
 	warn "<<<< ", $sock->peerhost, " [" . localtime() . "] ", $r->method, " ", $r->uri, " $size bytes\n";
 
+	$dump_nr++;
+	my $file = sprintf("dump/%04d-%s.request", $dump_nr, $sock->peerhost);
+
 	if ( $self->debug > 2 ) {
-		my $file = sprintf("dump/%04d-%s.request", $dump_nr++, $sock->peerhost);
 		write_file( $file, $r->as_string );
 		warn "### request dumped to file: $file\n";
 	}
@@ -122,6 +124,11 @@ sub process_request {
 		warn "## request payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
 
 		$state = CWMP::Request->parse( $xml );
+
+		if ( defined( $state->{_dispatch} ) && $self->debug > 2 ) {
+			my $type = sprintf("dump/%04d-%s-%s", $dump_nr, $sock->peerhost, $state->{_dispatch});
+			symlink $file, $type || warn "can't symlink $file -> $type: $!";
+		}
 
 		warn "## acquired state = ", dump( $state ), "\n";
 
