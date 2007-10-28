@@ -4,7 +4,7 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use File::Slurp;
@@ -41,3 +41,4 @@ check_response( 'InformResponse' );
 check_response( 'GetRPCMethods' );
 check_response( 'Reboot' );
 check_response( 'GetParameterNames' );
+check_response( 'GetParameterValues' );
