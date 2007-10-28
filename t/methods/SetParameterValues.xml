@@ -1,0 +1,24 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:cwmp="urn:dslforum-org:cwmp-1-0"
+               soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <soap:Header>
+    <cwmp:ID mustUnderstand="1">42</cwmp:ID>
+    <cwmp:NoMoreRequests>0</cwmp:NoMoreRequests>
+  </soap:Header>
+  <soap:Body>
+    <cwmp:SetParameterValues>
+      <cwmp:ParameterList>
+        <cwmp:ParameterNames>
+          <cwmp:ParameterValueStruct>
+            <cwmp:Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</cwmp:Name>
+            <cwmp:Value>test provision</cwmp:Value>
+          </cwmp:ParameterValueStruct>
+          <cwmp:ParameterValueStruct>
+            <cwmp:Name>InternetGatewayDevice.DeviceInfo.X_000E50_Country</cwmp:Name>
+            <cwmp:Value>42</cwmp:Value>
+          </cwmp:ParameterValueStruct>
+        </cwmp:ParameterNames>
+      </cwmp:ParameterList>
+    </cwmp:SetParameterValues>
+  </soap:Body>
+</soap:Envelope>

@@ -84,7 +84,56 @@ sub GetRPCMethods {
 
 =head2 SetParameterValues
 
-B<not implemented>
+  $method->SetParameterValues( $state,
+	param1 => 'value1',
+	param2 => 'value2',
+	...
+  );
+
+It doesn't support base64 encoding of values yet.
+
+To preserve data, it does support repeatable parametar names.
+Behaviour on this is not defined in protocol.
+
+=cut
+
+sub SetParameterValues {
+	my $self = shift;
+	my $state = shift;
+
+	confess "SetParameterValues needs parameters" unless @_;
+
+	my @params = @_;
+
+	my ( @names, @values );
+
+	while ( @_ ) {
+		push @names, shift @_;
+		push @values, shift @_;
+	}
+
+	confess "can't convert params ", dump( @params ), " to name/value pairs" unless $#names == $#values;
+
+	warn "# SetParameterValues", dump( @params ), "\n" if $self->debug;
+
+	$self->xml( $state, sub {
+		my ( $X, $state ) = @_;
+
+		$X->SetParameterValues( $cwmp,
+			$X->ParameterList( $cwmp,
+				$X->ParameterNames( $cwmp,
+					map {
+						$X->ParameterValueStruct( $cwmp,
+							$X->Name( $cwmp, $_ ),
+							$X->Value( $cwmp, shift @values )
+						)
+					} @names
+				)
+			)
+		);
+	});
+}
+
 
 =head2 GetParameterValues
 
@@ -96,7 +145,7 @@ sub GetParameterValues {
 	my $self = shift;
 	my $state = shift;
 	my @ParameterNames = @_;
-	confess "need ParameterNames" unless @ParameterNames;
+	confess "GetParameterValues need ParameterNames" unless @ParameterNames;
 	warn "# GetParameterValues", dump( @ParameterNames ), "\n" if $self->debug;
 
 	$self->xml( $state, sub {
