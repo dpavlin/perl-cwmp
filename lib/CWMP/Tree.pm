@@ -67,6 +67,9 @@ sub name2perl {
 
 	warn "## $s ", dump( $stat ), $/ if $self->debug;
 
+	# FIXME if it ends with a dot (array values), remove it
+	$s =~ s/\.$//;
+
 	return $s;
 }
 

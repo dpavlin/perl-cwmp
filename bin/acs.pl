@@ -33,7 +33,11 @@ my $server = CWMP::Server->new({
 	default_queue => [
 		'GetRPCMethods',
 		[ 'GetParameterNames', 'InternetGatewayDevice.DeviceInfo.SerialNumber', 0 ],
-		[ 'GetParameterValues', 'InternetGatewayDevice.DeviceInfo.SerialNumber', 1 ],
+		[ 'GetParameterNames', 'InternetGatewayDevice.DeviceInfo.', 1 ],
+		[ 'GetParameterValues',
+			'InternetGatewayDevice.DeviceInfo.SerialNumber',
+			'InternetGatewayDevice.DeviceInfo.VendorConfigFile.',
+		],
 #		'Reboot',
 	],
 });

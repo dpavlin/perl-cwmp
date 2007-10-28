@@ -34,7 +34,8 @@ sub new {
 
 
 my $cwmp = [ cwmp => 'urn:dslforum-org:cwmp-1-0' ];
-my $soap = [ soap => "http://schemas.xmlsoap.org/soap/envelope/" ];
+my $soap = [ soap => 'http://schemas.xmlsoap.org/soap/envelope/' ];
+my $xsd  = [ xsd  => 'http://www.w3.org/2001/XMLSchema-instance' ];
 
 =head2 InformResponse
 
@@ -103,21 +104,26 @@ sub GetParameterNames {
 
 =head2 GetParameterValues
 
-  $response->GetParameterValues( $state, $ParameterPath, $NextLevel );
+  $response->GetParameterValues( $state, $ParameterNames );
 
 =cut
 
 sub GetParameterValues {
-	my ( $self, $state, $ParameterPath, $NextLevel ) = @_;
-	$ParameterPath ||= '';	# all
-	$NextLevel ||= 0;		# all
-	warn "# GetParameterValues( '$ParameterPath', $NextLevel )\n" if $self->debug;
+	my $self = shift;
+	my $state = shift;
+	my @ParameterNames = @_;
+	confess "need ParameterNames" unless @ParameterNames;
+	warn "# GetParameterValues", dump( @ParameterNames ), "\n" if $self->debug;
+
 	$self->xml( $state, sub {
 		my ( $X, $state ) = @_;
 
 		$X->GetParameterValues( $cwmp,
-			$X->ParameterPath( $cwmp, $ParameterPath ),
-			$X->NextLevel( $cwmp, $NextLevel ),
+			$X->ParameterNames( $cwmp,
+				map {
+					$X->string( $xsd, $_ )
+				} @ParameterNames
+			)
 		);
 	});
 }

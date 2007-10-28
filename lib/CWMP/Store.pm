@@ -66,7 +66,7 @@ sub current_store {
 
 	confess "unknown store module $module not one of ", dump( $self->possible_stores ) unless $s;
 
-	warn "#### current store = $s\n" if $self->debug > 4;
+#	warn "#### current store = $s\n" if $self->debug > 4;
 
 	return $s;
 }

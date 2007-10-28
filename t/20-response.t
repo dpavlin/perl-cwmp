@@ -27,6 +27,7 @@ sub check_response {
 		ID => 42,
 	};
 
+	diag "check_response $command",dump( 'state', @_ ) if $debug;
 	ok( my $xml = $response->$command( $state, @_ ), "generate response $command" . dump(@_) );
 
 	my $file = "$abs_path/response/$command.xml";
@@ -44,5 +45,5 @@ sub check_response {
 check_response( 'InformResponse' );
 check_response( 'GetRPCMethods' );
 check_response( 'Reboot' );
-check_response( 'GetParameterNames', 'InternetGatewayDevice.DeviceInfo.SerialNumber', 0 );
-check_response( 'GetParameterValues' );
+check_response( 'GetParameterNames', 'InternetGatewayDevice.DeviceInfo.SerialNumber' );
+check_response( 'GetParameterValues', 'InternetGatewayDevice.DeviceInfo.SerialNumber', 'InternetGatewayDevice.DeviceInfo.VendorConfigFile.' );
