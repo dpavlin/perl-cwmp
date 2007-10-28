@@ -27,7 +27,7 @@ sub my_targets {
 
 dump: all
 	rm dump/* || true
-	./bin/acs.pl -d -d -d 2>&1 | tee log
+	./bin/acs.pl -d -d -d --protocol-dump 2>&1 | tee log
 
 html: \$(MAN1PODS) \$(MAN3PODS)
 	test -d html || mkdir html
