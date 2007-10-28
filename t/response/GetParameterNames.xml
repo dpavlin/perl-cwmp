@@ -1,0 +1,14 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:cwmp="urn:dslforum-org:cwmp-1-0"
+               soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <soap:Header>
+    <cwmp:ID mustUnderstand="1">42</cwmp:ID>
+    <cwmp:NoMoreRequests>0</cwmp:NoMoreRequests>
+  </soap:Header>
+  <soap:Body>
+    <cwmp:GetParameterNames>
+      <cwmp:ParameterPath></cwmp:ParameterPath>
+      <cwmp:NextLevel>0</cwmp:NextLevel>
+    </cwmp:GetParameterNames>
+  </soap:Body>
+</soap:Envelope>

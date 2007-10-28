@@ -4,83 +4,40 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Data::Dump qw/dump/;
+use Cwd qw/abs_path/;
+use File::Slurp;
 use blib;
 
 BEGIN {
 	use_ok('CWMP::Response');
 }
 
-#ok( my $xml = join("",<DATA>), 'xml' );
-#diag $xml if $debug;
+ok(my $abs_path = abs_path($0), "abs_path");
+$abs_path =~ s!/[^/]*$!/!;	#!fix-vim
 
 ok( my $response = CWMP::Response->new({ debug => $debug }), 'new' );
 isa_ok( $response, 'CWMP::Response' );
 
-sub is_like {
-	my ( $command, $template_xml ) = @_;
+sub check_response {
+	my $command = shift || die "no command?";
 
-	ok( my $xml = $response->$command({ ID => 42 }), $command );
-	diag $xml if $debug;
-	chomp( $xml );
-	chomp( $template_xml );
-	like( $xml, qr{^\Q$template_xml\E$}, $command . ' xml' );
+	ok( my $xml = $response->$command({ ID => 42 }), "generate response for $command" );
+
+	my $file = "$abs_path/response/$command.xml";
+
+	if ( ! -e $file ) {
+		diag "creating $file";
+		write_file( $file, $xml );
+	}
+
+	my $template_xml = read_file( $file ) || die "can't read template xml $file: $!";
+
+	is( $xml, $template_xml, "compare $command" );
 }
 
-is_like( 'InformResponse', <<__SOAP__
-<soap:Envelope xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-  <soap:Header>
-    <cwmp:ID mustUnderstand="1">42</cwmp:ID>
-    <cwmp:NoMoreRequests>0</cwmp:NoMoreRequests>
-  </soap:Header>
-  <soap:Body>
-    <cwmp:InformResponse>
-      <cwmp:MaxEnvelopes>1</cwmp:MaxEnvelopes>
-    </cwmp:InformResponse>
-  </soap:Body>
-</soap:Envelope>
-__SOAP__
-);
-
-is_like( 'GetRPCMethods', <<__SOAP__
-<soap:Envelope xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-  <soap:Header>
-    <cwmp:ID mustUnderstand="1">42</cwmp:ID>
-    <cwmp:NoMoreRequests>0</cwmp:NoMoreRequests>
-  </soap:Header>
-  <soap:Body>
-    <GetRPCMethods />
-  </soap:Body>
-</soap:Envelope>
-__SOAP__
-);
-
-is_like( 'Reboot', <<__SOAP__
-<soap:Envelope xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-  <soap:Header>
-    <cwmp:ID mustUnderstand="1">42</cwmp:ID>
-    <cwmp:NoMoreRequests>0</cwmp:NoMoreRequests>
-  </soap:Header>
-  <soap:Body>
-    <Reboot />
-  </soap:Body>
-</soap:Envelope>
-__SOAP__
-);
-
-is_like( 'GetParameterNames', <<__SOAP__
-<soap:Envelope xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-  <soap:Header>
-    <cwmp:ID mustUnderstand="1">42</cwmp:ID>
-    <cwmp:NoMoreRequests>0</cwmp:NoMoreRequests>
-  </soap:Header>
-  <soap:Body>
-    <cwmp:GetParameterNames>
-      <cwmp:ParameterPath></cwmp:ParameterPath>
-      <cwmp:NextLevel>0</cwmp:NextLevel>
-    </cwmp:GetParameterNames>
-  </soap:Body>
-</soap:Envelope>
-__SOAP__
-);
+check_response( 'InformResponse' );
+check_response( 'GetRPCMethods' );
+check_response( 'Reboot' );
+check_response( 'GetParameterNames' );
