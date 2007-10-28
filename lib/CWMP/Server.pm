@@ -138,7 +138,7 @@ sub process_request {
 	my $sock = $prop->{client};
 	confess "no sock in ", ref( $self ) unless $sock;
 
-	warn "default CPE queue ( " . join(",",@{$prop->{default_queue}}) . " )\n" if defined($prop->{default_queue});
+	warn "default CPE queue ", dump( $prop->{default_queue} ), "\n" if defined($prop->{default_queue});
 
 	eval  {
 		my $session = CWMP::Session->new({
