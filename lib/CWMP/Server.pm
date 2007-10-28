@@ -149,7 +149,7 @@ sub process_request {
 		}) || confess "can't create session";
 
 		while ( $session->process_request ) {
-			warn "...another one bites the dust...\n";
+			warn "...waiting for next request from CPE...\n";
 		}
 	};
 
