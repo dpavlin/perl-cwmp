@@ -3,7 +3,7 @@ use lib './lib';
 use inc::Module::Install;
 
 name		'CWMP';
-version		'0.05';
+version		'0.06';
 license		'GPL';
 requires	'Net::Server';
 requires	'HTTP::Daemon';

@@ -63,7 +63,7 @@ sub current_store {
 
 	confess "unknown store module $module not one of ", dump( $self->possible_stores ) unless $s;
 
-	warn "## current store = $s\n" if $self->debug;
+	warn "#### current store = $s\n" if $self->debug > 4;
 
 	return $s;
 }
@@ -84,7 +84,7 @@ sub update_state {
 	confess "need $k value" unless $v;
 	confess "need state" unless $state;
 
-	warn "## update_state( $k => $v, ", dump( $state ), " )\n" if $self->debug;
+	warn "#### update_state( $k => $v, ", dump( $state ), " )\n" if $self->debug > 4;
 
 	my $uid;
 
@@ -117,7 +117,7 @@ sub get_state {
 	confess "need ID or uid" unless $k =~ m/^(ID|uid)$/;
 	confess "need $k value" unless $v;
 
-	warn "## get_state( $k => $v )\n" if $self->debug;
+	warn "#### get_state( $k => $v )\n" if $self->debug > 4;
 
 	my $uid;
 
@@ -166,7 +166,7 @@ sub ID_to_uid {
 
 	confess "need ID" unless $ID;
 
-	warn "ID_to_uid",dump( $ID, $state ),$/ if $self->debug;
+	warn "#### ID_to_uid",dump( $ID, $state ),$/ if $self->debug > 4;
 
 	$session->{ $ID }->{last_seen} = time();
 
@@ -183,12 +183,9 @@ sub ID_to_uid {
 		return $uid;
 	} else {
 		warn "## can't find uid for ID $ID, first seen?\n";
-		return;
 	}
 
 	# TODO: expire sessions longer than 30m
-
-	warn "current session = ",dump( $session );
 
 	return;
 }

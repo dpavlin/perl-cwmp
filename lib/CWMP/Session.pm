@@ -35,7 +35,10 @@ CWMP::Session - implement logic of CWMP protocol
   my $server = CWMP::Session->new({
 	sock => $io_socket_object,
 	store => 'state.db',
-	queue => [ qw/GetRPCMethods GetParameterNames/ ],
+	queue => [
+		'GetRPCMethods',
+		[ 'GetParameterValyes', 'InternetGatewayDevice.DeviceInfo.SerialNumber', 0 ],
+	],
 	debug => 1,
   });
 
@@ -98,25 +101,27 @@ sub process_request {
 
 	my $r = $sock->get_request || confess "can't get_request";
 
-	my $chunk = $r->content;
+	my $xml = $r->content;
 
-	my $size = length( $chunk );
+	my $size = length( $xml );
 
 	warn "<<<< ", $sock->peerhost, " [" . localtime() . "] ", $r->method, " ", $r->uri, " $size bytes\n";
 
 	if ( $self->debug > 2 ) {
 		my $file = sprintf("dump/%04d-%s.request", $dump_nr++, $sock->peerhost);
 		write_file( $file, $r->as_string );
-		warn "### request dump: $file\n";
+		warn "### request dumped to file: $file\n";
 	}
 
 	my $state;
 
 	if ( $size > 0 ) {
 
-		die "no SOAPAction header in ",dump($chunk) unless defined ( $r->header('SOAPAction') );
+		die "no SOAPAction header in ",dump($xml) unless defined ( $r->header('SOAPAction') );
 
-		$state = CWMP::Request->parse( $chunk );
+		warn "## request payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
+
+		$state = CWMP::Request->parse( $xml );
 
 		warn "## acquired state = ", dump( $state ), "\n";
 
@@ -179,12 +184,19 @@ sub dispatch {
 	my $self = shift;
 
 	my $dispatch = shift || die "no dispatch?";
+	my @args = @_;
+
+	if ( ref($dispatch) eq 'ARRAY' ) {
+		my @a = @$dispatch;
+		$dispatch = shift @a;
+		push @args, @a;
+	}
 
 	my $response = CWMP::Response->new({ debug => $self->debug });
 
 	if ( $response->can( $dispatch ) ) {
 		warn ">>> dispatching to $dispatch\n";
-		my $xml = $response->$dispatch( $self->state, @_ );
+		my $xml = $response->$dispatch( $self->state, @args );
 		warn "## response payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
 		if ( $self->debug > 2 ) {
 			my $file = sprintf("dump/%04d-%s.response", $dump_nr++, $self->sock->peerhost);
