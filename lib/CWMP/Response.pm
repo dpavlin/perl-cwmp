@@ -66,7 +66,7 @@ sub GetRPCMethods {
 	});
 };
 
-=head2 Reboot {
+=head2 Reboot
 
   $response->Reboot( $state );
 
@@ -80,7 +80,7 @@ sub Reboot {
 	});
 }
 
-=head2 GetParameterNames {
+=head2 GetParameterNames
 
   $response->GetParameterNames( $state, $ParameterPath, $NextLevel );
 
@@ -101,7 +101,7 @@ sub GetParameterNames {
 	});
 }
 
-=head2 GetParameterValues {
+=head2 GetParameterValues
 
   $response->GetParameterValues( $state, $ParameterPath, $NextLevel );
 
