@@ -5,14 +5,14 @@ use Expect;
 use Net::Telnet;
 use Data::Dump qw/dump/;
 
+die "usage: $0 [modem] commands\n" unless @ARGV;
+
 my $modem = '10.0.0.138';
-$modem = shift @ARGV if $#ARGV > 1;
+$modem = shift @ARGV if $#ARGV >= 1;
 
 my @commands = (
 ':system config led=flash',
 );
-
-warn "ARGV = ",dump( $ARGV );
 
 sub ask {
 	my ( $prompt, $default ) = @_;
@@ -37,6 +37,8 @@ while(<>) {
 push @commands, ':system config led=off';
 
 my $debug = 0;
+
+warn "## connecting to $modem\n";
 
 my $telnet = new Net::Telnet( $modem ) or die "Cannot telnet to $modem: $!\n";
 my $exp = Expect->exp_init($telnet);
