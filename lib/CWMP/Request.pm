@@ -10,7 +10,7 @@ use Carp qw/confess cluck/;
 
 =head1 NAME
 
-CWMP::Request - parse SOAP request
+CWMP::Request - parse SOAP request metods
 
 =head1 METHODS
 
@@ -45,6 +45,26 @@ sub _tag {
 	}
 }
 
+=head2 parse
+
+  my $state = CWMP::Request->parse( "<soap>request</soap>" );
+
+=cut
+
+sub parse {
+	my $self = shift;
+
+	my $xml = shift || confess "no xml?";
+
+	$state = {};
+	$parser->parsestring( $xml );
+	return $state;
+}
+
+=head1 CPE metods
+
+=cut
+
 our $state;	# FIXME check this!
 
 my $tree = CWMP::Tree->new({ debug => 0 });
@@ -70,9 +90,13 @@ my $parser = XML::Rules->new(
 			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
 			$state->{ID} = $tag_hash->{_content};
 		},
-		#
-		# Inform
-		#
+
+=head2 Inform
+
+Generate InformResponse to CPE
+
+=cut
+
 		'Inform' => sub {
 			$state->{_dispatch} = 'InformResponse';		# what reponse to call
 		},
@@ -99,17 +123,20 @@ my $parser = XML::Rules->new(
 			my $value = (grep( /value/i, keys %$tag_hash ))[0];
 			$state->{Parameter}->{ _tag($tag_hash, 'Name', '_content') } = _tag($tag_hash, 'Value', '_content' );
 		},
-		#
-		# GetRPCMethodsResponse
-		#
+
+=head2 GetRPCMethodsResponse
+
+=cut
 		qr/^(?:^\w+:)*string$/ => 'content array',
 		'MethodList' => sub {
 			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
 			$state->{MethodList} = _tag( $tag_hash, 'string' );
 		},
-		#
-		# GetParameterNamesResponse
-		#
+
+=head2 GetParameterNamesResponse
+
+=cut
+
 		'ParameterInfoStruct' => sub {
 			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
 			my $name = _tag($tag_hash, 'Name', '_content');
@@ -124,9 +151,11 @@ my $parser = XML::Rules->new(
 
 			#warn "## state = dump( $state ), "\n";
 		},
-		#
-		# Fault
-		#
+	
+=head2 Fault
+
+=cut
+
 		'Fault' => sub {
 			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
 			$state->{Fault} = {
@@ -137,21 +166,5 @@ my $parser = XML::Rules->new(
 		}
 	]
 );
-
-=head2 parse
-
-  my $state = CWMP::Request->parse( "<soap>request</soap>" );
-
-=cut
-
-sub parse {
-	my $self = shift;
-
-	my $xml = shift || confess "no xml?";
-
-	$state = {};
-	$parser->parsestring( $xml );
-	return $state;
-}
 
 1;
