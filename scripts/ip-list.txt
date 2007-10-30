@@ -1,0 +1,4 @@
+:ip iflist
+:ip arplist
+:ip iplist
+:ip rtlist
