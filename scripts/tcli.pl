@@ -10,6 +10,8 @@ die "usage: $0 [modem] commands\n" unless @ARGV;
 my $modem = '10.0.0.138';
 $modem = shift @ARGV if $#ARGV >= 1;
 
+my $debug = 0;
+
 my @commands = (
 ':system config led=flash',
 );
@@ -28,15 +30,13 @@ while(<>) {
 	chomp;
 	next if (/^#/ || /^\s*$/);
 	my $l = $_;
-	warn "--$_--";
+	warn "--$_--" if $debug;
 	$l =~ s/ask\(([^|\)]+)(?:\|([^\)]+))?\)/ask($1,$2)/eg;
-	warn "++ $l\n";
+	warn "++ $l\n" if $debug;
 	push @commands, $l;
 }
 
 push @commands, ':system config led=off';
-
-my $debug = 0;
 
 warn "## connecting to $modem\n";
 
