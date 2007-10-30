@@ -171,6 +171,8 @@ sub ID_to_uid {
 
 	warn "#### ID_to_uid",dump( $ID, $state ),$/ if $self->debug > 4;
 
+	warn "##### current session = ",dump( $session ), $/ if $self->debug > 5;
+
 	$session->{ $ID }->{last_seen} = time();
 
 	my $uid;
