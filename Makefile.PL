@@ -42,9 +42,18 @@ features(
 	],
 );
 
+features(
+	'Pod coverage tests (for developers)' => [
+		-default => 0,
+		recommends('Test::Pod::Coverage'),
+	],
+);
+
+;
+
 my_targets();
 
-clean_files('dump/* yaml state.db html t/var/*');
+clean_files('dump/* yaml state.db html t/var/* queue');
 
 auto_install;
 
