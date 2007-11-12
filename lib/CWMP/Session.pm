@@ -149,8 +149,10 @@ sub process_request {
 
 	$sock->send( "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" ) if ( $state->{ID} );
 
+	my $uid = $self->store->ID_to_uid( $state->{ID}, $state );
+
 	my $queue = CWMP::Queue->new({
-		id => $self->store->ID_to_uid( $state->{ID}, $state ),
+		id => $uid,
 		debug => $self->debug,
 	});
 	my $job;
@@ -161,10 +163,10 @@ sub process_request {
 	} elsif ( $job = $queue->dequeue ) {
 		$xml = $self->dispatch( $job->dispatch );
 	} elsif ( $size == 0 ) {
-		warn ">>> no more queued commands, closing connection\n";
+		warn ">>> no more queued commands, closing connection to $uid\n";
 		return 0;
 	} else {
-		warn ">>> empty response\n";
+		warn ">>> empty response to $uid\n";
 		$state->{NoMoreRequests} = 1;
 		$xml = $self->dispatch( 'xml', sub {} );
 	}
@@ -172,10 +174,10 @@ sub process_request {
 	$sock->send( "Content-Length: " . length( $xml ) . "\r\n\r\n" );
 	$sock->send( $xml ) or die "can't send response";
 
-	warn ">>>> " . $sock->peerhost . " [" . localtime() . "] sent ", length( $xml )," bytes\n";
+	warn ">>>> " . $sock->peerhost . " [" . localtime() . "] sent ", length( $xml )," bytes to $uid\n";
 
 	$job->finish if $job;
-	warn "### request over\n" if $self->debug;
+	warn "### request over for $uid\n" if $self->debug;
 
 	return 1;	# next request
 };
