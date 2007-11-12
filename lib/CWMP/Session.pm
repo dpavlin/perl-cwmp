@@ -11,7 +11,6 @@ store
 
 sock
 state
-queue
 store
 / );
 
@@ -35,10 +34,6 @@ CWMP::Session - implement logic of CWMP protocol
   my $server = CWMP::Session->new({
 	sock => $io_socket_object,
 	store => 'state.db',
-	queue => [
-		'GetRPCMethods',
-		[ 'GetParameterValyes', 'InternetGatewayDevice.DeviceInfo.SerialNumber', 0 ],
-	],
 	debug => 1,
   });
 
@@ -153,13 +148,18 @@ sub process_request {
 	)."\r\n");
 
 	$sock->send( "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" ) if ( $state->{ID} );
-	
+
+	my $queue = CWMP::Queue->new({
+		id => $self->store->ID_to_uid( $state->{ID}, $state ),
+		debug => $self->debug,
+	});
+	my $job;
 	$xml = '';
 
 	if ( my $dispatch = $state->{_dispatch} ) {
 		$xml = $self->dispatch( $dispatch );
-	} elsif ( $dispatch = shift @{ $self->queue } ) {
-		$xml = $self->dispatch( $dispatch );
+	} elsif ( $job = $queue->dequeue ) {
+		$xml = $self->dispatch( $job->dispatch );
 	} elsif ( $size == 0 ) {
 		warn ">>> no more queued commands, closing connection\n";
 		return 0;
@@ -174,6 +174,7 @@ sub process_request {
 
 	warn ">>>> " . $sock->peerhost . " [" . localtime() . "] sent ", length( $xml )," bytes\n";
 
+	$job->finish if $job;
 	warn "### request over\n" if $self->debug;
 
 	return 1;	# next request

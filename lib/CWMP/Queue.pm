@@ -16,6 +16,7 @@ use Data::Dump qw/dump/;
 use File::Spec;
 use File::Path qw/mkpath/;
 use IPC::DirQueue;
+use YAML qw/Dump/;
 use Carp qw/confess/;
 
 =head1 NAME
@@ -74,16 +75,18 @@ sub enqueue {
 	my $self = shift;
 
 	my $id = $self->id;
-	my $data = {@_} || confess "need data";
-
-	warn "## enqueue( $id, ", dump( $data ), " )\n" if $self->debug;
-
-	$self->{dq}->{$id}->enqueue_string( $id, $data );
+	
+	warn "## enqueue( $id, ", dump( @_ ), " )\n" if $self->debug;
+	
+	$self->{dq}->{$id}->enqueue_string( Dump( @_ ) );
 }
 
 =head2 dequeue
 
-  my $data = $q->dequeue;
+  my $job = $q->dequeue;
+  my $dispatch = $job->dispatch;
+  # after dispatch is processed
+  $job->finish;
 
 =cut
 
@@ -92,11 +95,32 @@ sub dequeue {
 
 	my $id = $self->id;
 
-	my $data = $self->{dq}->{$id}->pickup_queued_job();
-	return unless defined $data;
+	my $job = $self->{dq}->{$id}->pickup_queued_job();
+	return unless defined $job;
 
-	warn "## dequeue( $id ) = ", dump( $data ), " )\n" if $self->debug;
+	warn "## dequeue( $id ) = ", dump( $job ), " )\n" if $self->debug;
 
-	return $data->{metadata};
+	return CWMP::Queue::Job->new({ job => $job });
 }
+
+package CWMP::Queue::Job;
+
+use base qw/Class::Accessor/;
+__PACKAGE__->mk_accessors( qw/
+job
+/ );
+
+use YAML qw/LoadFile/;
+
+sub dispatch {
+	my $self = shift;
+	my $path = $self->job->get_data_path || die "get_data_path?";
+	return LoadFile( $path ) || die "can't read $path: $!";
+}
+
+sub finish {
+	my $self = shift;
+	$self->job->finish;
+}
+
 1;

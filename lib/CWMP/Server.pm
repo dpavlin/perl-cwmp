@@ -8,7 +8,6 @@ use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 port
 store
-default_queue
 background
 debug
 
@@ -16,6 +15,7 @@ server
 / );
 
 use CWMP::Session;
+use CWMP::Queue;
 
 use Carp qw/confess/;
 use Data::Dump qw/dump/;
@@ -34,7 +34,6 @@ CWMP::Server - description
 		module => 'DBMDeep',
 		path => 'var/',
 	},
-	default_queue => [ qw/GetRPCMethods GetParameterNames/ ],                                                           
 	background => 1,
 	debug => 1
   });
@@ -51,10 +50,6 @@ port to listen on
 
 hash with key C<module> with value C<DBMDeep> if L<CWMP::Store::DBMDeep>
 is used. Other parametars are optional.
-
-=item default_queue
-
-commands which will be issued to every CPE on connect
 
 =back
 
@@ -75,7 +70,6 @@ sub new {
 		CWMP::Server::Helper->new({
 			proto => 'tcp',
 			port => $self->port,
-			default_queue => $self->default_queue,
 			store => $self->store,
 			debug => $self->debug,
 			background => $self->background,
@@ -119,10 +113,10 @@ sub options {
 	}
 
 	# new multi-value options
-	foreach my $p ( qw/ default_queue / ) {
-		$prop->{ $p } ||= [];
-		$template->{ $p } = $prop->{ $p };
-	}
+#	foreach my $p ( qw/ default_queue / ) {
+#		$prop->{ $p } ||= [];
+#		$template->{ $p } = $prop->{ $p };
+#	}
 }
 
 
@@ -138,12 +132,9 @@ sub process_request {
 	my $sock = $prop->{client};
 	confess "no sock in ", ref( $self ) unless $sock;
 
-	warn "default CPE queue ", dump( $prop->{default_queue} ), "\n" if defined($prop->{default_queue});
-
 	eval  {
 		my $session = CWMP::Session->new({
 			sock => $sock,
-			queue => $prop->{default_queue},
 			store => $prop->{store},
 			debug => $prop->{debug},
 		}) || confess "can't create session";

@@ -191,6 +191,8 @@ my $state = {
 
 is_deeply( $store->current_store->get_state( 'CP0644JTHJ4' ), $state, 'store->current_store->get_state' );
 
+diag "shutdown server";
+
 ok( kill(9,$pid), 'kill ' . $pid );
 
 ok( waitpid($pid,0), 'waitpid' );
