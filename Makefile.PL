@@ -24,6 +24,15 @@ requires	'Hash::Merge';
 
 build_requires 'Test::More';
 
+features(
+	'Command-line access to modems (tcli.pl)' => [
+		-default => 1,
+		requires('Expect'),
+		requires('Net::Telnet'),
+	],
+);
+
+
 my_targets();
 
 clean_files('dump/* yaml state.db html t/var/*');
