@@ -1,3 +1,3 @@
 :ip iplist
-:ip ipdelete addr=ask(IP:|192.168.1.250)
+:ip ipdelete addr=ask(delete IP:|192.168.1.250)
 :ip iplist
