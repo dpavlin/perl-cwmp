@@ -26,7 +26,7 @@ html: \$(MAN1PODS) \$(MAN3PODS)
 
 END_MAKEFILE
 
-	warn "added my targets: dump\n";
+	warn "added my targets: dump, html\n";
 
 	return $self;
 }
