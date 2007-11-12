@@ -21,17 +21,26 @@ requires	'Getopt::Long';
 requires	'Module::Pluggable';
 requires	'YAML';
 requires	'Hash::Merge';
+requires	'IPC::DirQueue';
+requires	'File::Spec';
+requires	'File::Path';
 
 build_requires 'Test::More';
 
 features(
 	'Command-line access to modems (tcli.pl)' => [
 		-default => 1,
-		requires('Expect'),
-		requires('Net::Telnet'),
+		recommends('Expect'),
+		recommends('Net::Telnet'),
 	],
 );
 
+features(
+	'HTML documentation (make html)' => [
+		-default => 0,
+		recommends('Pod::Xhtml'),
+	],
+);
 
 my_targets();
 
