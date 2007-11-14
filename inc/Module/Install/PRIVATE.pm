@@ -18,6 +18,7 @@ sub my_targets {
 
 dump: all
 	rm dump/* || true
+	rm -Rf queue/ || true
 	./bin/acs.pl -d -d -d -d 2>&1 | tee log
 
 html: \$(MAN1PODS) \$(MAN3PODS)

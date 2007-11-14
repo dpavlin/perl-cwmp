@@ -8,7 +8,7 @@ use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 debug
 create_dump
-store
+session
 
 sock
 state
@@ -34,7 +34,7 @@ CWMP::Session - implement logic of CWMP protocol
 
   my $server = CWMP::Session->new({
 	sock => $io_socket_object,
-	store => 'state.db',
+	store => { ... },
 	debug => 1,
 	create_dump => 1,
   });
@@ -46,10 +46,12 @@ sub new {
 	my $self = $class->SUPER::new( @_ );
 
 	confess "need sock" unless $self->sock;
+	confess "need store" unless $self->store;
+	my $peerhost = $self->sock->peerhost || confess "can't get sock->peerhost";
 
 	$self->debug( 0 ) unless $self->debug;
 
-	warn "created ", __PACKAGE__, "(", dump( @_ ), ") for ", $self->sock->peerhost, "\n" if $self->debug;
+	warn "created ", __PACKAGE__, "(", dump( @_ ), ") for $peerhost\n" if $self->debug;
 
 	my $store_obj = CWMP::Store->new({
 		debug => $self->debug,

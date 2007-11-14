@@ -113,10 +113,13 @@ if ( $list ) {
 
 	warn "injecting some tests commands\n";
 
-	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
+#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
 
-	$q->enqueue( 'GetParameterValues', [
-		'InternetGatewayDevice.',
-	]);
+#	$q->enqueue( 'GetParameterValues', [
+#		'InternetGatewayDevice.',
+#	]);
 
+	$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
+	$q->enqueue( 'SetParameterValues', { '.ExternalIPAddress' => '192.168.1.250' });
+	$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
 }

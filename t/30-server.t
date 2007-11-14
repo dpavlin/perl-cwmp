@@ -32,11 +32,14 @@ my $store_module = 'YAML';
 ok( my $server = CWMP::Server->new({
 	debug => $debug,
 	port => $port,
-	store => {
-		module => $store_module,
-		path => $store_path,
-		clean => 1,
-	},
+	session => {
+		store => {
+			module => $store_module,
+			path => $store_path,
+			clean => 1,
+		},
+		create_dump => 0,
+	}
 }), 'new' );
 isa_ok( $server, 'CWMP::Server' );
 
@@ -196,3 +199,4 @@ diag "shutdown server";
 ok( kill(9,$pid), 'kill ' . $pid );
 
 ok( waitpid($pid,0), 'waitpid' );
+

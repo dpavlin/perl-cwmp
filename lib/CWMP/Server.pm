@@ -7,7 +7,7 @@ use warnings;
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 port
-store
+session
 background
 debug
 
@@ -30,10 +30,7 @@ CWMP::Server - description
 
   my $server = CWMP::Server->new({
   	port => 3333,
-	store => {
-		module => 'DBMDeep',
-		path => 'var/',
-	},
+	session => { ... },
 	background => 1,
 	debug => 1
   });
@@ -46,7 +43,7 @@ Options:
 
 port to listen on
 
-=item store
+=item session
 
 hash with key C<module> with value C<DBMDeep> if L<CWMP::Store::DBMDeep>
 is used. Other parametars are optional.
@@ -70,7 +67,7 @@ sub new {
 		CWMP::Server::Helper->new({
 			proto => 'tcp',
 			port => $self->port,
-			store => $self->store,
+			session => $self->session,
 			debug => $self->debug,
 			background => $self->background,
 		})
@@ -107,7 +104,7 @@ sub options {
 	$self->SUPER::options($template);
 
 	# new single-value options
-	foreach my $p ( qw/ store debug / ) {
+	foreach my $p ( qw/ session debug / ) {
 		$prop->{ $p } ||= undef;
 		$template->{ $p } = \$prop->{ $p };
 	}
@@ -132,21 +129,22 @@ sub process_request {
 	my $sock = $prop->{client};
 	confess "no sock in ", ref( $self ) unless $sock;
 
+	my $sess = $prop->{session} || confess "no session";
+
 	eval  {
-		my $session = CWMP::Session->new({
-			sock => $sock,
-			store => $prop->{store},
-			debug => $prop->{debug},
-		}) || confess "can't create session";
+		$sess->{sock} = $sock;
+		$sess->{debug} = $prop->{debug};
+
+		warn "## sess = ", dump( $sess );
+
+		my $session = CWMP::Session->new( $sess ) || confess "can't create session from ",dump( $sess );
 
 		while ( $session->process_request ) {
 			warn "...waiting for next request from CPE...\n";
 		}
 	};
 
-	if ($@) {
-		warn $@;
-	}
+	warn "ERROR: $@\n" if $@;
 
 	warn "...returning to accepting new connections\n";
 

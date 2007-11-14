@@ -17,20 +17,25 @@ my $port = 3333;
 my $debug = 0;
 my $store_path = './';
 my $store_plugin = 'YAML';
+my $create_dump = 1;
 
 GetOptions(
 	'debug+' => \$debug,
 	'port=i' => \$port,
 	'store-path=s' => \$store_path,
 	'store-plugin=s' => \$store_plugin,
+	'create_dump!' => \$create_dump,
 );
 
 my $server = CWMP::Server->new({
 	port => $port,
-	store => {
-		module => $store_plugin,
-		path => $store_path,
-		debug => $debug,
+	session => {
+		store => {
+			module => $store_plugin,
+			path => $store_path,
+			debug => $debug,
+		},
+		create_dump => $create_dump,
 	},
 	debug => $debug,
 });
