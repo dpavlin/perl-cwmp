@@ -135,8 +135,6 @@ sub process_request {
 		$sess->{sock} = $sock;
 		$sess->{debug} = $prop->{debug};
 
-		warn "## sess = ", dump( $sess );
-
 		my $session = CWMP::Session->new( $sess ) || confess "can't create session from ",dump( $sess );
 
 		while ( $session->process_request ) {

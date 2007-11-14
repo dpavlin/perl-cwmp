@@ -54,7 +54,7 @@ sub state2serial {
 	my $serial = $state->{DeviceID}->{SerialNumber} || die "no serial?";
 	my $ip = $state->{Parameter}->{'.ExternalIPAddress'} || die "no ip?";
 
-	warn "## state2serial $serial $ip\n";
+	warn "## state2serial $serial $ip\n" if $debug;
 
 	( $last_ip, $last_serial ) = ( $ip, $serial );
 
@@ -63,11 +63,11 @@ sub state2serial {
 
 sub add_triggers {
 
-	warn __PACKAGE__, "->add_triggers\n";
+	warn __PACKAGE__, "->add_triggers\n" if $debug;
 
 CWMP::Request->add_trigger( name => 'Fault', callback => sub {
 	my ( $self, $state ) = @_;
-	warn "## Fault trigger state = ",dump( $self, $state );
+	warn "## Fault trigger state = ",dump( $self, $state ) if $debug;
 	die "can't map fault to serial!" unless $last_serial;
 	warn "ERROR: got Fault and ingoring $last_ip $last_serial\n";
 	$cpe_faulty->{$last_serial}++;
@@ -79,15 +79,15 @@ CWMP::Request->add_trigger( name => 'Inform', callback => sub {
 	my ( $serial, $ip ) = state2serial( $state );
 
 	if ( $cpe_faulty->{$serial} ) {
-		warn "## Inform trigger from $ip $serial -- IGNORED\n"; # if $debug;
+		warn "## Inform trigger from $ip $serial -- IGNORED\n" if $debug;
 		return;
 	}
 
-	warn "## Inform trigger from $ip $serial\n"; # if $debug;
+	warn "## Inform trigger from $ip $serial\n" if $debug;
 
 	my $found = 0;
 
-	warn "### serial2ip = ",dump( $serial2ip );
+	warn "### serial2ip = ",dump( $serial2ip ) if $debug;
 
 	foreach my $target_serial ( keys %$serial2ip ) {
 

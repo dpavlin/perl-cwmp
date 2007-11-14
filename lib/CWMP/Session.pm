@@ -204,8 +204,6 @@ If debugging level of 3 or more, it will create dumps of responses named C<< dum
 sub dispatch {
 	my $self = shift;
 
-warn "##!!! dispatch(",dump( @_ ),")\n";
-
 	my $dispatch = shift || die "no dispatch?";
 	my $args = shift;
 
