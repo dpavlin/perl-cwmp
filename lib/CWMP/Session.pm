@@ -7,6 +7,7 @@ use warnings;
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 debug
+create_dump
 store
 
 sock
@@ -35,6 +36,7 @@ CWMP::Session - implement logic of CWMP protocol
 	sock => $io_socket_object,
 	store => 'state.db',
 	debug => 1,
+	create_dump => 1,
   });
 
 =cut
@@ -58,6 +60,8 @@ sub new {
 
 	# FIXME looks ugly. Should we have separate accessor for this?
 	$self->store( $store_obj );
+
+	$self->create_dump( 1 ) if $self->debug > 2;
 
 	return $self;
 }
@@ -105,7 +109,7 @@ sub process_request {
 	$dump_nr++;
 	my $file = sprintf("dump/%04d-%s.request", $dump_nr, $sock->peerhost);
 
-	if ( $self->debug > 2 ) {
+	if ( $self->create_dump ) {
 		write_file( $file, $r->as_string );
 		warn "### request dumped to file: $file\n";
 	}
@@ -120,12 +124,17 @@ sub process_request {
 
 		$state = CWMP::Request->parse( $xml );
 
-		if ( defined( $state->{_dispatch} ) && $self->debug > 2 ) {
+		if ( defined( $state->{_dispatch} ) && $self->create_dump ) {
 			my $type = sprintf("dump/%04d-%s-%s", $dump_nr, $sock->peerhost, $state->{_dispatch});
 			symlink $file, $type || warn "can't symlink $file -> $type: $!";
 		}
 
 		warn "## acquired state = ", dump( $state ), "\n";
+
+		if ( ! defined( $state->{DeviceID} ) ) {
+			warn "## state with DeviceID, using old one...\n";
+			$state->{DeviceID} = $self->state->{DeviceID};
+		}
 
 		$self->state( $state );
 		$self->store->update_state( ID => $state->{ID}, $state );
@@ -204,7 +213,7 @@ warn "##!!! dispatch(",dump( @_ ),")\n";
 		warn ">>> dispatching to $dispatch with args ",dump( $args ),"\n";
 		my $xml = $response->$dispatch( $self->state, $args );
 		warn "## response payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
-		if ( $self->debug > 2 ) {
+		if ( $self->create_dump ) {
 			my $file = sprintf("dump/%04d-%s.response", $dump_nr++, $self->sock->peerhost);
 			write_file( $file, $xml );
 			warn "### response dump: $file\n";
