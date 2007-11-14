@@ -8,7 +8,10 @@ use strict;
 
 use lib './lib';
 use CWMP::Server;
+use CWMP::Session;
+use CWMP::Vendor;
 use Getopt::Long;
+use Data::Dump qw/dump/;
 
 my $port = 3333;
 my $debug = 0;
@@ -22,7 +25,6 @@ GetOptions(
 	'store-plugin=s' => \$store_plugin,
 );
 
-
 my $server = CWMP::Server->new({
 	port => $port,
 	store => {
@@ -32,5 +34,8 @@ my $server = CWMP::Server->new({
 	},
 	debug => $debug,
 });
+
+CWMP::Vendor->add_triggers;
+
 $server->run();
 

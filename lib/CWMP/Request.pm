@@ -56,6 +56,7 @@ my $rules =  [
 			# Name/Value tags must be case insnesitive
 			my $value = (grep( /value/i, keys %$tag_hash ))[0];
 			$state->{Parameter}->{ _tag($tag_hash, 'Name', '_content') } = _tag($tag_hash, 'Value', '_content' );
+			$state->{_trigger} = 'ParameterValue';
 		},
 
 ];
@@ -151,7 +152,8 @@ sub parse {
 	$state = {};
 	$parser->parsestring( $xml );
 	if ( my $trigger = $state->{_trigger} ) {
-		__PACKAGE__->call_trigger( $trigger, $state );
+		warn "### call_trigger( $trigger )\n";
+		$self->call_trigger( $trigger, $state );
 	}
 	# XXX don't propagate _trigger (useful?)
 	delete( $state->{_trigger} );

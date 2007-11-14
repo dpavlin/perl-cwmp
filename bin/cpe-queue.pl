@@ -113,13 +113,10 @@ if ( $list ) {
 
 	warn "injecting some tests commands\n";
 
-	$q->enqueue( 'SetParameterValues', {
-		'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'test provision',
-#		'InternetGatewayDevice.DeviceInfo.X_000E50_Country' => 1,
-	});
+	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
 
 	$q->enqueue( 'GetParameterValues', [
-		'InternetGatewayDevice.DeviceInfo.ProvisioningCode',
+		'InternetGatewayDevice.',
 	]);
 
 }
