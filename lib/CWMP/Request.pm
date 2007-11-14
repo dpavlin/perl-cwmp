@@ -7,12 +7,15 @@ use XML::Rules;
 use CWMP::Tree;
 use Data::Dump qw/dump/;
 use Carp qw/confess cluck/;
+use Class::Trigger;
 
 =head1 NAME
 
 CWMP::Request - parse SOAP request metods
 
 =head1 CPE metods
+
+All methods described below call triggers with same name
 
 =cut
 
@@ -66,6 +69,7 @@ Generate InformResponse to CPE
 push @$rules,
 	'Inform' => sub {
 		$state->{_dispatch} = 'InformResponse';		# what reponse to call
+		$state->{_trigger} = 'Inform';
 	};
 
 =head2 GetRPCMethodsResponse
@@ -77,6 +81,7 @@ push @$rules,
 		'MethodList' => sub {
 			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
 			$state->{MethodList} = _tag( $tag_hash, 'string' );
+			$state->{_trigger} = 'GetRPCMethodsResponse';
 		};
 
 =head2 GetParameterNamesResponse
@@ -97,6 +102,8 @@ push @$rules,
 			confess "can't eval $s : $@" if ($@);
 
 			#warn "## state = dump( $state ), "\n";
+
+			$state->{_trigger} = 'GetParameterNamesResponse';
 		};
 	
 =head2 Fault
@@ -111,6 +118,7 @@ push @$rules,
 				FaultString => _tag( $tag_hash, 'FaultString', '_content' ),
 			};
 			warn "FAULT: ", $state->{Fault}->{FaultCode}, " ", $state->{Fault}->{FaultString}, "\n";
+			$state->{_trigger} = 'Fault';
 		};
 
 my $parser = XML::Rules->new(
@@ -142,6 +150,11 @@ sub parse {
 
 	$state = {};
 	$parser->parsestring( $xml );
+	if ( my $trigger = $state->{_trigger} ) {
+		__PACKAGE__->call_trigger( $trigger, $state );
+	}
+	# XXX don't propagate _trigger (useful?)
+	delete( $state->{_trigger} );
 	return $state;
 }
 

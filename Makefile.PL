@@ -24,6 +24,7 @@ requires	'Hash::Merge';
 requires	'IPC::DirQueue';
 requires	'File::Spec';
 requires	'File::Path';
+requires	'Class::Trigger';
 
 build_requires 'Test::More';
 

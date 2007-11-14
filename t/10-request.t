@@ -4,7 +4,7 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 53;
+use Test::More tests => 73;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use File::Slurp;
@@ -21,12 +21,23 @@ ok( $#models + 1, 'got models' );
 ok(my $abs_path = abs_path($0), "abs_path");
 $abs_path =~ s!/[^/]*$!/!;	#!fix-vim
 
+my $path2method;
+my $triggers_count;
+
 sub file_is_deeply {
 	my ( $path ) = @_;
 
 	ok( my $xml = read_file( $path ), "read_file( $path )" );
 
 	diag $xml if $debug;
+
+	ok( my $trigger = $path2method->{$path}, "path2method($path)" );
+
+	CWMP::Request->add_trigger( name => $trigger, callback => sub {
+		my ( $self, $state ) = @_;
+		$triggers_count->{$trigger}++;
+		ok( $state, "called trigger $trigger" );
+	});
 
 	ok( my $state = CWMP::Request->parse( $xml ), 'parse' );
 
@@ -47,7 +58,13 @@ foreach my $model ( @models ) {
 
 	my $dir = "$abs_path/$model/";
 	opendir(DIR, $dir) || die "can't opendir $dir: $!";
-	my @xmls = map { "$dir/$_" } grep { /\.xml$/ && -f "$dir/$_" } readdir(DIR);
+	my @xmls = map {
+		my $path = "$dir/$_";
+		my $method = $_;
+		$method =~ s/\.xml$//;
+		$path2method->{$path} = $method;
+		$path;
+	} grep { /\.xml$/ && -f "$dir/$_" } readdir(DIR);
 	closedir DIR;
 
 	diag "$model has ", $#xmls + 1, " xml tests";
@@ -59,4 +76,6 @@ foreach my $model ( @models ) {
 		file_is_deeply( $xml_path );
 	}
 }
+
+diag "triggers_count = ",dump( $triggers_count ) if $debug;
 
