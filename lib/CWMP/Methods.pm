@@ -84,11 +84,11 @@ sub GetRPCMethods {
 
 =head2 SetParameterValues
 
-  $method->SetParameterValues( $state,
+  $method->SetParameterValues( $state, {
 	param1 => 'value1',
 	param2 => 'value2',
 	...
-  );
+  });
 
 It doesn't support base64 encoding of values yet.
 
@@ -103,18 +103,9 @@ sub SetParameterValues {
 
 	confess "SetParameterValues needs parameters" unless @_;
 
-	my @params = @_;
+	my $params = shift || return;
 
-	my ( @names, @values );
-
-	while ( @_ ) {
-		push @names, shift @_;
-		push @values, shift @_;
-	}
-
-	confess "can't convert params ", dump( @params ), " to name/value pairs" unless $#names == $#values;
-
-	warn "# SetParameterValues", dump( @params ), "\n" if $self->debug;
+	warn "# SetParameterValues = ", dump( $params ), "\n" if $self->debug;
 
 	$self->xml( $state, sub {
 		my ( $X, $state ) = @_;
@@ -125,9 +116,9 @@ sub SetParameterValues {
 					map {
 						$X->ParameterValueStruct( $cwmp,
 							$X->Name( $cwmp, $_ ),
-							$X->Value( $cwmp, shift @values )
+							$X->Value( $cwmp, $params->{$_} )
 						)
-					} @names
+					} sort keys %$params
 				)
 			)
 		);
@@ -137,14 +128,20 @@ sub SetParameterValues {
 
 =head2 GetParameterValues
 
-  $method->GetParameterValues( $state, $ParameterNames );
+  $method->GetParameterValues( $state, [ 'ParameterName', ... ] );
 
 =cut
+
+sub _array_param {
+	my $v = shift;
+	confess "array_mandatory(",dump($v),") isn't ARRAY" unless ref($v) eq 'ARRAY';
+	return @$v;
+}
 
 sub GetParameterValues {
 	my $self = shift;
 	my $state = shift;
-	my @ParameterNames = @_;
+	my @ParameterNames = _array_param(shift);
 	confess "GetParameterValues need ParameterNames" unless @ParameterNames;
 	warn "# GetParameterValues", dump( @ParameterNames ), "\n" if $self->debug;
 
@@ -163,14 +160,16 @@ sub GetParameterValues {
 
 =head2 GetParameterNames
 
-  $method->GetParameterNames( $state, $ParameterPath, $NextLevel );
+  $method->GetParameterNames( $state, [ $ParameterPath, $NextLevel ] );
 
 =cut
 
 sub GetParameterNames {
-	my ( $self, $state, $ParameterPath, $NextLevel ) = @_;
-	$ParameterPath ||= '';	# all
-	$NextLevel ||= 0;		# all
+	my ( $self, $state, $param ) = @_;
+	# default: all, all
+	my ( $ParameterPath, $NextLevel ) = _array_param( $param );
+	$ParameterPath ||= '';
+	$NextLevel ||= 0;
 	warn "# GetParameterNames( '$ParameterPath', $NextLevel )\n" if $self->debug;
 	$self->xml( $state, sub {
 		my ( $X, $state ) = @_;

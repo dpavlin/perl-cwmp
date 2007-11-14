@@ -4,7 +4,7 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 213;
+use Test::More tests => 255;
 use Data::Dump qw/dump/;
 use lib 'lib';
 
@@ -23,18 +23,23 @@ ok( my $obj = CWMP::Queue->new({
 isa_ok( $obj, 'CWMP::Queue' );
 
 for my $i ( 1 .. 42 ) {
-	ok( $obj->enqueue({
-		i => $i,
-		foo => 'bar',
-	}), "enqueue $i" );
+	ok( $obj->enqueue(
+		"command-$i",
+		{
+			i => $i,
+			foo => 'bar',
+		}
+	), "enqueue $i" );
 };
 
 my $i = 1;
 
 while ( my $job = $obj->dequeue ) {
 	ok( $job, "dequeue $i" );
-	ok( my $dispatch = $job->dispatch, "dispatch $i" );
-	cmp_ok( $dispatch->{i}, '==', $i, "i == $i" );
+	ok( my ( $dispatch, $args ) = $job->dispatch, "job->dispatch $i" );
+	cmp_ok( $dispatch, 'eq', "command-$i", "dispatch $i" );
+	diag "args = ",dump( $args ) if $debug;
+	cmp_ok( $args->{i}, '==', $i, "args i == $i" );
 	ok( $job->finish, "finish $i" );
 	$i++;
 }

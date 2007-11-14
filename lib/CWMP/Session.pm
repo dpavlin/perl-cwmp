@@ -193,20 +193,16 @@ If debugging level of 3 or more, it will create dumps of responses named C<< dum
 sub dispatch {
 	my $self = shift;
 
-	my $dispatch = shift || die "no dispatch?";
-	my @args = @_;
+warn "##!!! dispatch(",dump( @_ ),")\n";
 
-	if ( ref($dispatch) eq 'ARRAY' ) {
-		my @a = @$dispatch;
-		$dispatch = shift @a;
-		push @args, @a;
-	}
+	my $dispatch = shift || die "no dispatch?";
+	my $args = shift;
 
 	my $response = CWMP::Methods->new({ debug => $self->debug });
 
 	if ( $response->can( $dispatch ) ) {
-		warn ">>> dispatching to $dispatch\n";
-		my $xml = $response->$dispatch( $self->state, @args );
+		warn ">>> dispatching to $dispatch with args ",dump( $args ),"\n";
+		my $xml = $response->$dispatch( $self->state, $args );
 		warn "## response payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
 		if ( $self->debug > 2 ) {
 			my $file = sprintf("dump/%04d-%s.response", $dump_nr++, $self->sock->peerhost);

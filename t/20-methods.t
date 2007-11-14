@@ -28,7 +28,7 @@ sub check_method {
 	};
 
 	diag "check_method $command",dump( 'state', @_ ) if $debug;
-	ok( my $xml = $method->$command( $state, @_ ), "generate method $command" . dump(@_) );
+	ok( my $xml = $method->$command( $state, shift ), "generate method $command" . dump(@_) );
 
 	my $file = "$abs_path/methods/$command.xml";
 
@@ -45,12 +45,12 @@ sub check_method {
 check_method( 'InformResponse' );
 check_method( 'GetRPCMethods' );
 check_method( 'Reboot' );
-check_method( 'SetParameterValues',
+check_method( 'SetParameterValues', {
 	'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'test provision',
 	'InternetGatewayDevice.DeviceInfo.X_000E50_Country' => 42,
-);
-check_method( 'GetParameterNames', 'InternetGatewayDevice.DeviceInfo.SerialNumber' );
-check_method( 'GetParameterValues',
+});
+check_method( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.SerialNumber' ] );
+check_method( 'GetParameterValues', [
 	'InternetGatewayDevice.DeviceInfo.SerialNumber',
 	'InternetGatewayDevice.DeviceInfo.VendorConfigFile.',
-);
+]);

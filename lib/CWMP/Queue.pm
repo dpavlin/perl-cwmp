@@ -66,7 +66,9 @@ sub new {
 =head2 enqueue
 
   $q->enqueue(
-  	'foo.bar.baz' => 42,
+  	'CommandToDispatch', {
+  		'foo.bar.baz' => 42,
+	}
   );
 
 =cut
@@ -75,16 +77,17 @@ sub enqueue {
 	my $self = shift;
 
 	my $id = $self->id;
+	my ( $dispatch, $args ) = @_;
+
+	warn "## enqueue( $dispatch with ", dump( $args ), " ) for $id\n" if $self->debug;
 	
-	warn "## enqueue( $id, ", dump( @_ ), " )\n" if $self->debug;
-	
-	$self->{dq}->{$id}->enqueue_string( Dump( @_ ) );
+	$self->{dq}->{$id}->enqueue_string( Dump({ dispatch => $dispatch, args => $args }) );
 }
 
 =head2 dequeue
 
   my $job = $q->dequeue;
-  my $dispatch = $job->dispatch;
+  my ( $dispatch, $args ) = $job->dispatch;
   # after dispatch is processed
   $job->finish;
 
@@ -98,25 +101,62 @@ sub dequeue {
 	my $job = $self->{dq}->{$id}->pickup_queued_job();
 	return unless defined $job;
 
-	warn "## dequeue( $id ) = ", dump( $job ), " )\n" if $self->debug;
+	warn "## dequeue for $id = ", dump( $job ), " )\n" if $self->debug;
 
-	return CWMP::Queue::Job->new({ job => $job });
+	return CWMP::Queue::Job->new({ job => $job, debug => $self->debug });
+}
+
+=head2 dq
+
+Accessor to C<IPC::DirQueue> object
+
+  my $dq = $q->dq;
+
+=cut
+
+sub dq {
+	my $self = shift;
+	return $self->{dq}->{$self->id};
 }
 
 package CWMP::Queue::Job;
 
+=head1 CWMP::Queue::Job
+
+Single queued job
+
+=cut
+
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 job
+debug
 / );
 
 use YAML qw/LoadFile/;
+use Data::Dump qw/dump/;
+
+=head2 dispatch
+
+  my ( $dispatch, $args ) = $job->dispatch;
+
+=cut
 
 sub dispatch {
 	my $self = shift;
 	my $path = $self->job->get_data_path || die "get_data_path?";
-	return LoadFile( $path ) || die "can't read $path: $!";
+	my $data = LoadFile( $path ) || die "can't read $path: $!";
+	warn "## dispatch returns ",dump($data),"\n" if $self->debug;
+	return ( $data->{dispatch}, $data->{args} );
 }
+
+=head2 finish
+
+Finish job and remove it from queue
+
+  $job->finish;
+
+=cut
 
 sub finish {
 	my $self = shift;
