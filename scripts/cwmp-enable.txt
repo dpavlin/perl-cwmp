@@ -1,6 +1,6 @@
 # just a comment
 :cwmp debug traceconfig level=1
-:cwmp server config url=http://192.168.1.241:3333/
+:cwmp server config url=http://10.0.0.100:3333/
 :cwmp config state=enabled mode=full periodicInform=enabled periodicInfInt=15
 
 
