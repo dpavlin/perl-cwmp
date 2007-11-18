@@ -58,8 +58,14 @@ my ( $last_ip, $last_serial );
 sub state2serial {
 	my $state = shift;
 
-	my $serial = $state->{DeviceID}->{SerialNumber} || die "no serial?";
-	my $ip = $state->{Parameter}->{'.ExternalIPAddress'} || die "no ip?";
+	my $serial = $state->{DeviceID}->{SerialNumber} || die "no DeviceID.SerialNumber in ",dump($state);
+	my $ip =
+		$state->{Parameter}->{'.ExternalIPAddress'} ||
+		$state->{Parameter}->{
+			# fix for firmware 5.3.3.4 which returns full path
+			( grep { m/\.ExternalIPAddress/ } keys %{ $state->{Parameter} } )[0]
+		} ||
+		die "no .ExternalIPAddress in ",dump($state);
 
 	warn "## state2serial $serial $ip\n" if $debug;
 
