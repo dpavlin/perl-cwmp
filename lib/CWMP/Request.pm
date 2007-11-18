@@ -97,10 +97,16 @@ push @$rules,
 
 			confess "need state" unless ( $state );	# don't remove!
 
+=for obsolete
+
 			# XXX dragons ahead: convert name to tree rewriting it into perl
 			my $s = '$state->{ParameterInfo}->' . $tree->name2perl( $name ) . "->{writable} = $writable;";
 			eval "$s";
 			confess "can't eval $s : $@" if ($@);
+
+=cut
+
+			$state->{ParameterInfo}->{$name} = $writable;
 
 			#warn "## state = dump( $state ), "\n";
 
