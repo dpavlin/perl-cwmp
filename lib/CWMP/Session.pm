@@ -161,7 +161,7 @@ sub process_request {
 
 	my $uid = $self->store->state_to_uid( $state );
 
-	my $to_uid = join(" ", "to $uid",
+	my $to_uid = join(" ", grep { defined($_) } "to $uid",
 			# board
 			$state->{Parameter}->{'InternetGatewayDevice.DeviceInfo.HardwareVersion'},
 			# version
