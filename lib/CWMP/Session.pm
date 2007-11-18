@@ -150,17 +150,25 @@ sub process_request {
 		#warn "last request state = ", dump( $state ), "\n" if $self->debug > 1;
 	}
 
-
 	$sock->send(join("\r\n",
 		'HTTP/1.1 200 OK',
 		'Content-Type: text/xml; charset="utf-8"',
-		'Server: AcmeCWMP/42',
-		'SOAPServer: AcmeCWMP/42'
+		'Server: PerlCWMP/42',
+		'SOAPServer: PerlCWMP/42'
 	)."\r\n");
 
 	$sock->send( "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" ) if ( $state->{ID} );
 
 	my $uid = $self->store->state_to_uid( $state );
+
+	my $to_uid = join(" ", "to $uid",
+			# board
+			$state->{Parameter}->{'InternetGatewayDevice.DeviceInfo.HardwareVersion'},
+			# version
+			$state->{Parameter}->{'InternetGatewayDevice.DeviceInfo.SoftwareVersion'},
+			# summary
+#			$state->{Parameter}->{'InternetGatewayDevice.DeviceSummary'},
+	) . "\n";
 
 	my $queue = CWMP::Queue->new({
 		id => $uid,
@@ -174,10 +182,10 @@ sub process_request {
 	} elsif ( $job = $queue->dequeue ) {
 		$xml = $self->dispatch( $job->dispatch );
 	} elsif ( $size == 0 ) {
-		warn ">>> no more queued commands, closing connection to $uid\n";
+		warn ">>> no more queued commands, closing connection $to_uid";
 		return 0;
 	} else {
-		warn ">>> empty response to $uid\n";
+		warn ">>> empty response $to_uid";
 		$state->{NoMoreRequests} = 1;
 		$xml = $self->dispatch( 'xml', sub {} );
 	}
@@ -185,7 +193,7 @@ sub process_request {
 	$sock->send( "Content-Length: " . length( $xml ) . "\r\n\r\n" );
 	$sock->send( $xml ) or die "can't send response";
 
-	warn ">>>> " . $sock->peerhost . " [" . localtime() . "] sent ", length( $xml )," bytes to $uid\n";
+	warn ">>>> " . $sock->peerhost . " [" . localtime() . "] sent ", length( $xml )," bytes $to_uid";
 
 	$job->finish if $job;
 	warn "### request over for $uid\n" if $self->debug;

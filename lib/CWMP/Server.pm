@@ -138,13 +138,13 @@ sub process_request {
 		my $session = CWMP::Session->new( $sess ) || confess "can't create session from ",dump( $sess );
 
 		while ( $session->process_request ) {
-			warn "...waiting for next request from CPE...\n";
+			warn "...waiting for next request from CPE...\n" if $prop->{debug};
 		}
 	};
 
 	warn "ERROR: $@\n" if $@;
 
-	warn "...returning to accepting new connections\n";
+	warn "...returning to accepting new connections\n" if $prop->{debug};
 
 }
 
