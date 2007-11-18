@@ -4,7 +4,7 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 34;
+use Test::More tests => 32;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use lib 'lib';
@@ -42,29 +42,37 @@ sub test_store {
 		},
 	};
 
-	cmp_ok( $store->ID_to_uid( 42, $state ), 'eq', 123456, 'ID_to_uid' );
+	cmp_ok( $store->state_to_uid( $state ), 'eq', 123456, 'state_to_uid' );
 
-	ok( $store->update_state( ID => 42, $state ), 'update_state new' );
+	ok( $store->update_state( $state ), 'update_state new' );
 
-	ok( my $store_state = $store->get_state( ID => '42'), 'get_state ID' );
+	ok( my $store_state = $store->get_state( 123456 ), 'get_state' );
 
-	is_deeply( $store_state, $state, 'state ID' );
+	isa_ok( $state, 'HASH' );
+	isa_ok( $store_state, 'HASH' );
 
-	ok( $store_state = $store->get_state( uid =>  123456 ), 'get_state uid' );
+	if ( $debug ) {
 
-	is_deeply( $store_state, $state, 'state ID same as uid' );
+		diag "store_state = ",dump( $store_state );
+	
+	}
 
-	ok( $store->update_state( ID => 42, { baz => 12345 } ), 'update_state existing' );
+	is_deeply( $state, $store_state, 'state ID same as uid' );
+
+	ok( $store->update_state( {
+		DeviceID => {
+			SerialNumber => 123456,
+		},
+		baz => 12345 
+	} ), 'update_state existing' );
 
 	$state->{baz} = 12345;
 
-	is_deeply( $store->get_state( ID => 42 ), $state, 'get_state ID' );
-
-	is_deeply( $store->get_state( uid => 123456 ), $state, 'get_state uid' );
+	is_deeply( $store->get_state( 123456 ), $state, 'get_state' );
 
 	is_deeply( [ $store->all_uids ], [ 123456 ], 'all_uids' );
 
-	ok( $store->update_state( ID => 11, { DeviceID => { SerialNumber => 99999 } } ), 'new device' );
+	ok( $store->update_state( { DeviceID => { SerialNumber => 99999 } } ), 'new device' );
 
 	is_deeply( [ $store->all_uids ], [ 123456, 99999 ], 'all_uids' );
 

@@ -6,6 +6,7 @@ use warnings;
 
 use DBM::Deep;
 use Data::Dump qw/dump/;
+use Clone qw/clone/;
 use Carp qw/confess/;
 
 =head1 NAME
@@ -62,12 +63,14 @@ sub open {
 sub update_uid_state {
 	my ( $self, $uid, $state ) = @_;
 
+	my $data = clone( $state );
+
 	if ( my $o = $db->get( $uid ) ) {
 		warn "## update state of $uid\n" if $debug;
-		return $o->import( $state );
+		$o->import( $data );
 	} else {
 		warn "## create new state for $uid\n" if $debug;
-		return $db->put( $uid => $state );
+		$db->put( $uid => $data );
 	}
 }
 
@@ -81,9 +84,7 @@ sub get_state {
 	my ( $self, $uid ) = @_;
 
 	if ( my $state = $db->get( $uid ) ) {
-		return $state->export;
-	} else {
-		return;
+		$state->export;
 	}
 }
 

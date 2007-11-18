@@ -73,42 +73,26 @@ sub current_store {
 
 =head2 update_state
 
-  $store->update_state( ID => $ID, $state );
-  $store->update_state( uid => $uid, $state );
+  $store->update_state( $state );
 
 =cut
 
 sub update_state {
 	my $self = shift;
 
-	my ( $k, $v, $state ) = @_;
+	my ( $state ) = @_;
 
-	confess "need ID or uid" unless $k =~ m/^(ID|uid)$/;
-	confess "need $k value" unless $v;
 	confess "need state" unless $state;
 
-	warn "#### update_state( $k => $v, ", dump( $state ), " )\n" if $self->debug > 4;
+	my $uid = $self->state_to_uid( $state );
 
-	my $uid;
-
-	if ( $k eq 'ID' ) {
-		if ( $uid = $self->ID_to_uid( $v, $state ) ) {
-			# nop
-		} else {
-			warn "## no uid for $v, first seen?\n" if $self->debug;
-			return;
-		}
-	} else {
-		$uid = $v;
-	}
-
+	warn "#### update_state( ", dump( $state ), " ) for $uid\n" if $self->debug > 2;
 	$self->current_store->update_uid_state( $uid, $state );
 }
 
 =head2 get_state
 
-  my $state = $store->get_state( ID => $ID );
-  my $state = $store->get_state( uid => $uid );
+  my $state = $store->get_state( $uid );
 
 Returns normal unblessed hash (actually, in-memory copy of state in database).
 
@@ -116,24 +100,10 @@ Returns normal unblessed hash (actually, in-memory copy of state in database).
 
 sub get_state {
 	my $self = shift;
-	my ( $k, $v ) = @_;
-	confess "need ID or uid" unless $k =~ m/^(ID|uid)$/;
-	confess "need $k value" unless $v;
+	my ( $uid ) = @_;
+	confess "need uid" unless $uid;
 
-	warn "#### get_state( $k => $v )\n" if $self->debug > 4;
-
-	my $uid;
-
-	if ( $k eq 'ID' ) {
-		if ( $uid = $self->ID_to_uid( $v ) ) {
-			# nop
-		} else {
-			warn "## no uid for $v so no state!\n" if $self->debug;
-			return;
-		}
-	} else {
-		$uid = $v;
-	}
+	warn "#### get_state( $uid )\n" if $self->debug > 4;
 
 	return $self->current_store->get_state( $uid );
 
@@ -152,47 +122,25 @@ sub all_uids {
 	return @cpes;
 }
 
-=head2 ID_to_uid
+=head2 state_to_uid
 
-  my $CPE_uid = $store->ID_to_uid( $ID, $state );
+  my $CPE_uid = $store->ID_to_uid( $state );
 
 It uses C<< DeviceID.SerialNumber >> from C<Inform> message as unique ID
 for each CPE.
 
 =cut
 
-my $session;
-
-sub ID_to_uid {
+sub state_to_uid {
 	my $self = shift;
-	my ( $ID, $state ) = @_;
+	my ( $state ) = @_;
 
-	confess "need ID" unless $ID;
+	warn "#### state_to_uid",dump( $state ),$/ if $self->debug > 4;
 
-	warn "#### ID_to_uid",dump( $ID, $state ),$/ if $self->debug > 4;
+	my $uid = $state->{DeviceID}->{SerialNumber} ||
+		confess "no DeviceID.SerialNumber in ",dump( $state );
 
-	warn "##### current session = ",dump( $session ), $/ if $self->debug > 5;
-
-	$session->{ $ID }->{last_seen} = time();
-
-	my $uid;
-
-	if ( $uid = $session->{ $ID }->{ ID_to_uid } ) {
-		return $uid;
-	} elsif ( $uid = $state->{DeviceID}->{SerialNumber} ) {
-		warn "## created new session for $uid session $ID\n" if $self->debug;
-		$session->{ $ID } = {
-			last_seen => time(),
-			ID_to_uid => $uid,
-		};
-		return $uid;
-	} else {
-		warn "## can't find uid for ID $ID, first seen?\n";
-	}
-
-	# TODO: expire sessions longer than 30m
-
-	return;
+	return $uid;
 }
 
 1;

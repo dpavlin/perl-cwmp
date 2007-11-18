@@ -42,11 +42,18 @@ sub new {
 my $cpe_faulty;
 
 my $serial2ip = {
-	'CP0636JT3SH' => '192.168.1.242',
-	'CP0644JTHJ4' => '192.168.1.253',
+	'CP0636JT3SH' => '10.0.0.1',
+	'CP0644JTHJ4' => '10.0.0.2',
+	'CP0624BH55U' => '10.0.0.3',
 };
 
 my ( $last_ip, $last_serial );
+
+=head2 state2serial
+
+  my $serial = state2serial( $state );
+
+=cut
 
 sub state2serial {
 	my $state = shift;
@@ -60,6 +67,14 @@ sub state2serial {
 
 	return ( $serial, $ip );
 }
+
+=head2 add_triggers
+
+Install all custom triggers
+
+  CWMP::Vendor->add_triggers;
+
+=cut
 
 sub add_triggers {
 

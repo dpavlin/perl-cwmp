@@ -139,7 +139,7 @@ sub process_request {
 		}
 
 		$self->state( $state );
-		$self->store->update_state( ID => $state->{ID}, $state );
+		$self->store->update_state( $state );
 
 	} else {
 
@@ -160,7 +160,7 @@ sub process_request {
 
 	$sock->send( "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" ) if ( $state->{ID} );
 
-	my $uid = $self->store->ID_to_uid( $state->{ID}, $state );
+	my $uid = $self->store->state_to_uid( $state );
 
 	my $queue = CWMP::Queue->new({
 		id => $uid,

@@ -3,7 +3,7 @@ use lib './lib';
 use inc::Module::Install;
 
 name		'CWMP';
-version		'0.10';
+version		'0.11';
 license		'GPL';
 requires	'Net::Server';
 requires	'HTTP::Daemon';
@@ -16,6 +16,7 @@ requires	'Net::HTTP';
 requires	'Cwd';
 requires	'File::Slurp';
 requires	'DBM::Deep';
+requires	'Clone';	# CWMP::Store::DBMDeep
 requires	'Getopt::Long';
 #requires	'Term::Shelly'	=>	'0.03';
 requires	'Module::Pluggable';
