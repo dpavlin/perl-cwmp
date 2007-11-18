@@ -36,7 +36,6 @@ if ( $protocol_dump ) {
 	warn "generating dump of xml protocol with CPE\n";
 
 	$q->enqueue( 'GetRPCMethods' );
-	$q->enqueue( 'GetParameterNames' );
 
 	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.SerialNumber', 0 ] );
 	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.', 1 ] );
@@ -51,7 +50,7 @@ if ( $protocol_dump ) {
 #		'InternetGatewayDevice.DeviceInfo.X_000E50_Country' => 1,
 	});
 
-#	$q->enqueue( 'Reboot' );
+	$q->enqueue( 'Reboot' );
 
 }
 
@@ -119,7 +118,6 @@ if ( $list ) {
 #		'InternetGatewayDevice.',
 #	]);
 
-	$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
-	$q->enqueue( 'SetParameterValues', { '.ExternalIPAddress' => '192.168.1.250' });
-	$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
+#	$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
+	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
 }
