@@ -113,7 +113,7 @@ sub process_request {
 
 	if ( $self->create_dump ) {
 		write_file( $file, $r->as_string );
-		warn "### request dumped to file: $file\n";
+		warn "### request dumped to file: $file\n" if $self->debug;
 	}
 
 	my $state;
@@ -131,7 +131,7 @@ sub process_request {
 			symlink $file, $type || warn "can't symlink $file -> $type: $!";
 		}
 
-		warn "## acquired state = ", dump( $state ), "\n";
+		warn "## acquired state = ", dump( $state ), "\n" if $self->debug;
 
 		if ( ! defined( $state->{DeviceID} ) ) {
 			warn "## state with DeviceID, using old one...\n";
@@ -216,7 +216,7 @@ sub dispatch {
 		if ( $self->create_dump ) {
 			my $file = sprintf("dump/%04d-%s.response", $dump_nr++, $self->sock->peerhost);
 			write_file( $file, $xml );
-			warn "### response dump: $file\n";
+			warn "### response dump: $file\n" if $self->debug;
 		}
 		return $xml;
 	} else {
