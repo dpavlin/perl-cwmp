@@ -21,103 +21,120 @@ GetOptions(
 	'list!' => \$list,
 );
 
-my $id = shift @ARGV || die "usage: $0 CPE_id [--protocol-dump]\n";
+die "usage: $0 CPE_id [--protocol-dump]\n" unless @ARGV;
 
-$id =~ s!^.*queue/+!!;
-$id =~ s!/+$!!;	#!
+foreach my $id ( @ARGV ) {
 
-die "ID isn't valid: $id\n" unless $id =~ m/^\w+$/;
+	$id =~ s!^.*queue/+!!;
+	$id =~ s!/+$!!;	#!
 
-my $q = CWMP::Queue->new({ id => $id, debug => $debug });
+	die "ID isn't valid: $id\n" unless $id =~ m/^\w+$/;
+
+	my $q = CWMP::Queue->new({ id => $id, debug => $debug });
 
 
-if ( $protocol_dump ) {
+	if ( $protocol_dump ) {
 
-	warn "generating dump of xml protocol with CPE\n";
+		warn "generating dump of xml protocol with CPE\n";
 
-	$q->enqueue( 'GetRPCMethods' );
+		$q->enqueue( 'GetRPCMethods' );
 
-	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.SerialNumber', 0 ] );
-	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.', 1 ] );
+		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.SerialNumber', 0 ] );
+		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.', 1 ] );
 
-	$q->enqueue( 'GetParameterValues', [
-		'InternetGatewayDevice.DeviceInfo.SerialNumber',
-		'InternetGatewayDevice.DeviceInfo.VendorConfigFile.',
-		'InternetGatewayDevice.DeviceInfo.X_000E50_Country',
-	] );
-	$q->enqueue( 'SetParameterValues', {
-		'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'test provision',
-#		'InternetGatewayDevice.DeviceInfo.X_000E50_Country' => 1,
-	});
+		$q->enqueue( 'GetParameterValues', [
+			'InternetGatewayDevice.DeviceInfo.SerialNumber',
+			'InternetGatewayDevice.DeviceInfo.VendorConfigFile.',
+			'InternetGatewayDevice.DeviceInfo.X_000E50_Country',
+		] );
+		$q->enqueue( 'SetParameterValues', {
+			'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'test provision',
+	#		'InternetGatewayDevice.DeviceInfo.X_000E50_Country' => 1,
+		});
 
-	$q->enqueue( 'Reboot' );
+		$q->enqueue( 'Reboot' );
 
-}
-
-if ( $list ) {
-
-	warn "list all jobs for $id\n";
-
-	my @active = ();
-	my @queued = ();
-	my $hostname = $q->dq->gethostname();
-
-	sub wanted {
-	  my ($visitcontext, $job) = @_;
-
-	  my $data = $job->get_data_path();
-	  my $nbytes = $job->get_data_size_bytes();
-	  my $timet = $job->get_time_submitted_secs();
-	  my $hname = $job->get_hostname_submitted();
-	  my $jobid = $job->{jobid};
-
-	  my $text = sprintf (
-				"%s (%d bytes)\n  Submitted: %s on %s\n",
-				$jobid, $nbytes, scalar localtime $timet, $hname);
-
-		$text .= read_file( $data ) || die "can't open $data: $!";
-
-	  if ($job->{active_pid})
-	  {
-		if ($hostname eq $job->{active_host}
-			&& !kill (0, $job->{active_pid}))
-		{
-		  $text = sprintf (
-				"(dead lockfile)\n  %s",
-				$text);
-		}
-		else {
-		  $text = sprintf (
-				"(pid: %d\@%s)\n  %s",
-				$job->{active_pid}, $job->{active_host}, $text);
-		}
-
-		push (@active, $text);
-	  }
-	  else {
-		push (@queued, $text);
-	  }
-
-	  $job->finish();
 	}
 
-	$q->dq->visit_all_jobs(\&wanted, undef);
-	printf "Jobs: active: %d  queued: %d\n",
-			scalar @active, scalar @queued;
-	
-	print "Active jobs [", scalar @active, "]\n",join("\n\n", @active) if @active;
-	print "Queued jobs [", scalar @queued, "]\n",join("\n\n", @queued) if @queued;
+	if ( $list ) {
 
-} else {
+		warn "list all jobs for $id\n";
 
-	warn "injecting some tests commands\n";
+		my @active = ();
+		my @queued = ();
+		my $hostname = $q->dq->gethostname();
 
-#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
+		sub wanted {
+		  my ($visitcontext, $job) = @_;
 
-#	$q->enqueue( 'GetParameterValues', [
-#		'InternetGatewayDevice.',
-#	]);
+		  my $data = $job->get_data_path();
+		  my $nbytes = $job->get_data_size_bytes();
+		  my $timet = $job->get_time_submitted_secs();
+		  my $hname = $job->get_hostname_submitted();
+		  my $jobid = $job->{jobid};
 
-#	$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
-	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
+		  my $text = sprintf (
+					"%s (%d bytes)\n  Submitted: %s on %s\n",
+					$jobid, $nbytes, scalar localtime $timet, $hname);
+
+			$text .= read_file( $data ) || die "can't open $data: $!";
+
+		  if ($job->{active_pid})
+		  {
+			if ($hostname eq $job->{active_host}
+				&& !kill (0, $job->{active_pid}))
+			{
+			  $text = sprintf (
+					"(dead lockfile)\n  %s",
+					$text);
+			}
+			else {
+			  $text = sprintf (
+					"(pid: %d\@%s)\n  %s",
+					$job->{active_pid}, $job->{active_host}, $text);
+			}
+
+			push (@active, $text);
+		  }
+		  else {
+			push (@queued, $text);
+		  }
+
+		  $job->finish();
+		}
+
+		$q->dq->visit_all_jobs(\&wanted, undef);
+		printf "Jobs: active: %d  queued: %d\n",
+				scalar @active, scalar @queued;
+		
+		print "Active jobs [", scalar @active, "]\n",join("\n\n", @active) if @active;
+		print "Queued jobs [", scalar @queued, "]\n",join("\n\n", @queued) if @queued;
+
+	} else {
+
+		warn "injecting some tests commands\n";
+
+		$q->enqueue( 'GetRPCMethods' );
+
+	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
+
+	#	$q->enqueue( 'GetParameterValues', [
+	#		'InternetGatewayDevice.',
+	#	]);
+
+	#	$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
+
+	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
+	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.', 1 ] );
+	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceConfig.', 1 ] );
+	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.ManagementServer.', 1 ] );
+	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.Services.', 1 ] );
+	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
+
+		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 0 ] );
+		$q->enqueue( 'GetParameterValues', [
+			'InternetGatewayDevice.',
+		]);
+	}
+
 }
