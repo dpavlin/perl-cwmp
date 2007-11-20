@@ -12,6 +12,7 @@ use CWMP::Session;
 use CWMP::Vendor;
 use Getopt::Long;
 use Data::Dump qw/dump/;
+use File::Find;
 
 my $port = 3333;
 my $debug = 0;
@@ -26,6 +27,19 @@ GetOptions(
 	'store-plugin=s' => \$store_plugin,
 	'create_dump!' => \$create_dump,
 );
+
+if ( $create_dump ) {
+	warn "## cleaning dump directory\n" if $debug;
+	find({
+		wanted => sub {
+			my $path = $File::Find::name;
+			return if -d $path;
+			unlink($path) || die "can't remove $path: $!";
+			warn "## removed $path\n" if $debug;
+		},
+		no_chdir => 1,
+	}, 'dump/' );
+}
 
 my $server = CWMP::Server->new({
 	port => $port,

@@ -26,6 +26,7 @@ requires	'IPC::DirQueue';
 requires	'File::Spec';
 requires	'File::Path';
 requires	'Class::Trigger';
+requires	'File::Find';
 
 build_requires 'Test::More';
 
