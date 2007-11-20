@@ -135,6 +135,12 @@ foreach my $id ( @ARGV ) {
 		$q->enqueue( 'GetParameterValues', [
 			'InternetGatewayDevice.',
 		]);
+
+		$q->enqueue( 'GetParameterAttributes', [
+			'InternetGatewayDevice.DeviceInfo.SerialNumber',
+		]);
+
+#		$q->enqueue( 'SetParameterAttributes', [ '
 	}
 
 }

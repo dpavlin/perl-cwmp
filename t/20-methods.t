@@ -4,7 +4,7 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 16;
+use Test::More tests => 18;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use File::Slurp;
@@ -53,4 +53,7 @@ check_method( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.SerialNum
 check_method( 'GetParameterValues', [
 	'InternetGatewayDevice.DeviceInfo.SerialNumber',
 	'InternetGatewayDevice.DeviceInfo.VendorConfigFile.',
+]);
+check_method( 'GetParameterAttributes', [
+	'InternetGatewayDevice.DeviceInfo.SerialNumber'
 ]);

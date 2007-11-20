@@ -142,7 +142,6 @@ sub GetParameterValues {
 	my $self = shift;
 	my $state = shift;
 	my @ParameterNames = _array_param(shift);
-	confess "GetParameterValues need ParameterNames" unless @ParameterNames;
 	warn "# GetParameterValues", dump( @ParameterNames ), "\n" if $self->debug;
 
 	$self->xml( $state, sub {
@@ -177,6 +176,31 @@ sub GetParameterNames {
 		$X->GetParameterNames( $cwmp,
 			$X->ParameterPath( $cwmp, $ParameterPath ),
 			$X->NextLevel( $cwmp, $NextLevel ),
+		);
+	});
+}
+
+=head2 GetParameterAttributes
+
+	$method->GetParameterAttributes( $state, [ $ParametarNames, ... ] );
+
+=cut
+
+sub GetParameterAttributes {
+	my ( $self, $state, $param ) = @_;
+	my @ParameterNames = _array_param($param);
+
+	warn "# GetParameterAttributes", dump( @ParameterNames ), "\n" if $self->debug;
+
+	$self->xml( $state, sub {
+		my ( $X, $state ) = @_;
+
+		$X->GetParameterAttributes( $cwmp,
+			$X->ParameterNames( $cwmp,
+				map {
+					$X->string( $xsd, $_ )
+				} @ParameterNames
+			)
 		);
 	});
 }
