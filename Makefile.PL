@@ -36,23 +36,22 @@ features(
 		recommends('Expect'),
 		recommends('Net::Telnet'),
 	],
-);
-
-features(
 	'HTML documentation (make html)' => [
 		-default => 0,
 		recommends('Pod::Xhtml'),
 	],
-);
-
-features(
 	'Pod coverage tests (for developers)' => [
 		-default => 0,
 		recommends('Test::Pod::Coverage'),
 	],
+	'Memory leak detection (for developers)' => [
+		-default => 0,
+		recommends('Devel::Events' => '0.02'),
+		recommends('Devel::Events::Handler::ObjectTracker'),
+		recommends('Devel::Events::Generator::Objects'),
+		recommends('Devel::Size'),
+	],
 );
-
-;
 
 my_targets();
 

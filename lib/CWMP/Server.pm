@@ -16,6 +16,7 @@ server
 
 use CWMP::Session;
 use CWMP::Queue;
+use CWMP::MemLeak;
 
 use Carp qw/confess/;
 use Data::Dump qw/dump/;
@@ -124,6 +125,8 @@ sub options {
 sub process_request {
 	my $self = shift;
 
+	my $leak = CWMP::MemLeak->new;
+
 	my $prop = $self->{server};
 	confess "no server in ", ref( $self ) unless $prop;
 	my $sock = $prop->{client};
@@ -145,6 +148,8 @@ sub process_request {
 	warn "ERROR: $@\n" if $@;
 
 	warn "...returning to accepting new connections\n" if $prop->{debug};
+
+	$leak->report;
 
 }
 
