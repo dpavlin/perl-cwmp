@@ -19,8 +19,6 @@ All methods described below call triggers with same name
 
 =cut
 
-my $tree = CWMP::Tree->new({ debug => 0 });
-
 our $state;	# FIXME check this!
 
 my $rules =  [
@@ -97,15 +95,6 @@ push @$rules,
 
 			confess "need state" unless ( $state );	# don't remove!
 
-=for obsolete
-
-			# XXX dragons ahead: convert name to tree rewriting it into perl
-			my $s = '$state->{ParameterInfo}->' . $tree->name2perl( $name ) . "->{writable} = $writable;";
-			eval "$s";
-			confess "can't eval $s : $@" if ($@);
-
-=cut
-
 			$state->{ParameterInfo}->{$name} = $writable;
 
 			#warn "## state = dump( $state ), "\n";
@@ -128,20 +117,6 @@ push @$rules,
 			$state->{_trigger} = 'Fault';
 		};
 
-my $parser = XML::Rules->new(
-#	start_rules => [
-#		'^division_name,fax' => 'skip',
-#	],
-	namespaces => {
-		'http://schemas.xmlsoap.org/soap/envelope/' => 'soapenv',
-		'http://schemas.xmlsoap.org/soap/encoding/' => 'soap',
-		'http://www.w3.org/2001/XMLSchema' => 'xsd',
-		'http://www.w3.org/2001/XMLSchema-instance' => 'xsi',
-		'urn:dslforum-org:cwmp-1-0' => '',
-	},
-	rules => $rules,
-);
-
 =head1 METHODS
 
 =head2 parse
@@ -155,7 +130,22 @@ sub parse {
 
 	my $xml = shift || confess "no xml?";
 
+	my $parser = XML::Rules->new(
+#		start_rules => [
+#			'^division_name,fax' => 'skip',
+#		],
+		namespaces => {
+			'http://schemas.xmlsoap.org/soap/envelope/' => 'soapenv',
+			'http://schemas.xmlsoap.org/soap/encoding/' => 'soap',
+			'http://www.w3.org/2001/XMLSchema' => 'xsd',
+			'http://www.w3.org/2001/XMLSchema-instance' => 'xsi',
+			'urn:dslforum-org:cwmp-1-0' => '',
+		},
+		rules => $rules,
+	);
+
 	$state = {};
+
 	$parser->parsestring( $xml );
 	if ( my $trigger = $state->{_trigger} ) {
 		warn "### call_trigger( $trigger )\n";

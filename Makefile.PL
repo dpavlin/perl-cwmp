@@ -46,10 +46,7 @@ features(
 	],
 	'Memory leak detection (for developers)' => [
 		-default => 0,
-		recommends('Devel::Events' => '0.02'),
-		recommends('Devel::Events::Handler::ObjectTracker'),
-		recommends('Devel::Events::Generator::Objects'),
-		recommends('Devel::Size'),
+		recommends('Devel::LeakTrace::Fast' => 0.11),
 	],
 );
 

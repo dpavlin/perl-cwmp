@@ -116,20 +116,20 @@ foreach my $id ( @ARGV ) {
 
 		$q->enqueue( 'GetRPCMethods' );
 
-	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
+#		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
 
-	#	$q->enqueue( 'GetParameterValues', [
-	#		'InternetGatewayDevice.',
-	#	]);
+		$q->enqueue( 'GetParameterValues', [
+		'InternetGatewayDevice.',
+		]);
 
-	#	$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
+#		$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
 
-	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
-	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.', 1 ] );
-	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceConfig.', 1 ] );
-	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.ManagementServer.', 1 ] );
-	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.Services.', 1 ] );
-	#	$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
+		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
+#		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.', 1 ] );
+#		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceConfig.', 1 ] );
+#		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.ManagementServer.', 1 ] );
+#		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.Services.', 1 ] );
+#		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
 
 		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 0 ] );
 		$q->enqueue( 'GetParameterValues', [
@@ -138,6 +138,7 @@ foreach my $id ( @ARGV ) {
 
 		$q->enqueue( 'GetParameterAttributes', [
 			'InternetGatewayDevice.DeviceInfo.SerialNumber',
+  			'InternetGatewayDevice.DeviceInfo.SoftwareVersion',
 		]);
 
 #		$q->enqueue( 'SetParameterAttributes', [ '
