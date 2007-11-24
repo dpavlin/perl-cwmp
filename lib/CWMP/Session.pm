@@ -17,12 +17,14 @@ store
 
 use HTTP::Daemon;
 use Data::Dump qw/dump/;
-use Carp qw/confess cluck croak/;
+use Carp qw/carp confess cluck croak/;
 use File::Slurp;
 
 use CWMP::Request;
 use CWMP::Methods;
 use CWMP::Store;
+
+#use Devel::LeakTrace::Fast;
 
 =head1 NAME
 
@@ -100,7 +102,12 @@ sub process_request {
 	# solution from http://use.perl.org/~Matts/journal/12896
 	${*$sock}{'httpd_daemon'} = HTTP::Daemon->new;
 
-	my $r = $sock->get_request || confess "can't get_request";
+	my $r = $sock->get_request;
+	
+	if ( ! $r ) {
+		carp "can't get_request";
+		return 0;
+	}
 
 	my $xml = $r->content;
 
@@ -182,8 +189,9 @@ sub process_request {
 	} elsif ( $job = $queue->dequeue ) {
 		$xml = $self->dispatch( $job->dispatch );
 	} elsif ( $size == 0 ) {
-		warn ">>> no more queued commands, closing connection $to_uid";
-		return 0;
+		warn ">>> no more queued commands, no client pending, closing connection $to_uid";
+		$sock->close;
+		return;
 	} else {
 		warn ">>> empty response $to_uid";
 		$state->{NoMoreRequests} = 1;

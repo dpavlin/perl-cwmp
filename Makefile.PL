@@ -20,7 +20,6 @@ requires	'Clone';	# CWMP::Store::DBMDeep
 requires	'Getopt::Long';
 #requires	'Term::Shelly'	=>	'0.03';
 requires	'Module::Pluggable';
-requires	'YAML';
 requires	'Hash::Merge';
 requires	'IPC::DirQueue';
 requires	'File::Spec';
@@ -31,6 +30,14 @@ requires	'File::Find';
 build_requires 'Test::More';
 
 features(
+	'CWMP::Store::YAML' => [
+		-default => 1,
+		recommends('YAML::Syck' => 0.91),
+	],
+	'CWMP::Store::JSON' => [
+		-default => 1,
+		recommends('JSON::XS'),
+	],
 	'Command-line access to modems (tcli.pl)' => [
 		-default => 1,
 		recommends('Expect'),

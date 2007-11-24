@@ -4,7 +4,6 @@ use warnings;
 use strict;
 
 use XML::Rules;
-use CWMP::Tree;
 use Data::Dump qw/dump/;
 use Carp qw/confess cluck/;
 use Class::Trigger;
@@ -21,7 +20,7 @@ All methods described below call triggers with same name
 
 our $state;	# FIXME check this!
 
-my $rules =  [
+our $rules =  [
 		#_default => 'content trim',
 		x_default => sub {
 			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
@@ -125,12 +124,7 @@ push @$rules,
 
 =cut
 
-sub parse {
-	my $self = shift;
-
-	my $xml = shift || confess "no xml?";
-
-	my $parser = XML::Rules->new(
+my $parser = XML::Rules->new(
 #		start_rules => [
 #			'^division_name,fax' => 'skip',
 #		],
@@ -142,7 +136,12 @@ sub parse {
 			'urn:dslforum-org:cwmp-1-0' => '',
 		},
 		rules => $rules,
-	);
+);
+
+sub parse {
+	my $self = shift;
+
+	my $xml = shift || confess "no xml?";
 
 	$state = {};
 

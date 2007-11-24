@@ -39,7 +39,7 @@ sub new {
 	return $self;
 }
 
-my $cpe_faulty;
+our $cpe_faulty;
 
 my $serial2ip = {
 	'CP0636JT3SH' => '10.0.0.1',

@@ -4,7 +4,7 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use blib;
@@ -192,7 +192,9 @@ my $state = {
   _dispatch      => "InformResponse",
 };
 
-is_deeply( $store->current_store->get_state( 'CP0644JTHJ4' ), $state, 'store->current_store->get_state' );
+ok( my $store_state = $store->current_store->get_state( 'CP0644JTHJ4' ), 'get_state' );
+
+is_deeply( $store_state, $state, 'store->current_store->get_state' );
 
 diag "shutdown server";
 

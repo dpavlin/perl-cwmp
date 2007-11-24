@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Data::Dump qw/dump/;
-use YAML qw/LoadFile DumpFile/;
+use YAML::Syck;
 use Hash::Merge qw/merge/;
 use Carp qw/confess/;
 
