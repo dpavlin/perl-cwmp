@@ -1,0 +1,21 @@
+--- 
+ID: 226_THOM_TR69_ID
+ParameterInfo: 
+  InternetGatewayDevice.DeviceInfo.AdditionalHardwareVersion: 0
+  InternetGatewayDevice.DeviceInfo.Description: 0
+  InternetGatewayDevice.DeviceInfo.HardwareVersion: 0
+  InternetGatewayDevice.DeviceInfo.Manufacturer: 0
+  InternetGatewayDevice.DeviceInfo.ManufacturerOUI: 0
+  InternetGatewayDevice.DeviceInfo.ModelName: 0
+  InternetGatewayDevice.DeviceInfo.ModemFirmwareVersion: 0
+  InternetGatewayDevice.DeviceInfo.ProductClass: 0
+  InternetGatewayDevice.DeviceInfo.ProvisioningCode: 1
+  InternetGatewayDevice.DeviceInfo.SerialNumber: 0
+  InternetGatewayDevice.DeviceInfo.SoftwareVersion: 0
+  InternetGatewayDevice.DeviceInfo.SpecVersion: 0
+  InternetGatewayDevice.DeviceInfo.UpTime: 0
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.: 0
+  InternetGatewayDevice.DeviceInfo.VendorConfigFileNumberOfEntries: 0
+  InternetGatewayDevice.DeviceInfo.X_000E50_Country: 1
+  InternetGatewayDevice.DeviceInfo.X_000E50_SIMLocked: 0
+_trigger: GetParameterNamesResponse

@@ -1,0 +1,10 @@
+--- 
+ID: 226_THOM_TR69_ID
+Parameter: 
+  InternetGatewayDevice.DeviceInfo.SerialNumber: CP0703KT3PP
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Date: 0000-00-00T00:00:00
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Description: Factory Defaults
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Name: Routed PPPoE on 8/35
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Version: ~
+  InternetGatewayDevice.DeviceInfo.X_000E50_Country: ~
+_trigger: ParameterValue

@@ -1,0 +1,52 @@
+POST / HTTP/1.1
+Host: 10.0.0.100
+User-Agent: Thomson_cwmp-engine/r7.4.1.7
+Content-Length: 2573
+Content-Type: text/xml; charset=ISO-8859-1
+SOAPAction: 
+
+<soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+ <soapenv:Header>
+<cwmp:ID soapenv:mustUnderstand="1">3_THOM_TR69_ID</cwmp:ID>
+ </soapenv:Header>
+ <soapenv:Body>
+<cwmp:Inform><DeviceId> <Manufacturer>THOMSON</Manufacturer>
+ <OUI>00147F</OUI>
+ <ProductClass>SpeedTouch 780</ProductClass>
+ <SerialNumber>CP0644JTHJ4</SerialNumber>
+</DeviceId>
+<Event soap:arrayType="cwmp:EventStruct[01]"><EventStruct> <EventCode>2 PERIODIC</EventCode>
+ <CommandKey></CommandKey>
+</EventStruct>
+</Event>
+<MaxEnvelopes>2</MaxEnvelopes>
+<CurrentTime>1970-01-01T00:02:16Z</CurrentTime>
+<RetryCount>00</RetryCount>
+<ParameterList soap:arrayType="cwmp:ParameterValueStruct[08]"><ParameterValueStruct> <Name>.ExternalIPAddress</Name>
+ <Value xsi:type="xsd:string">10.0.0.2</Value>
+</ParameterValueStruct>
+     <ParameterValueStruct>      <Name>InternetGatewayDevice.DeviceInfo.HardwareVersion</Name>
+      <Value xsi:type="xsd:string">BANT-R</Value>
+</ParameterValueStruct>
+     <ParameterValueStruct>      <Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</Name>
+      <Value xsi:type="xsd:string">test provision</Value>
+</ParameterValueStruct>
+     <ParameterValueStruct>      <Name>InternetGatewayDevice.DeviceInfo.SoftwareVersion</Name>
+      <Value xsi:type="xsd:string">7.4.1.7</Value>
+</ParameterValueStruct>
+     <ParameterValueStruct>      <Name>InternetGatewayDevice.DeviceInfo.SpecVersion</Name>
+      <Value xsi:type="xsd:string">1.0</Value>
+</ParameterValueStruct>
+     <ParameterValueStruct>      <Name>InternetGatewayDevice.DeviceSummary</Name>
+      <Value xsi:type="xsd:string">InternetGatewayDevice:1.3[](Baseline:1, EthernetLAN:1, ADSLWAN:1, EthernetWAN:1, Bridging:1, Time:1, DeviceAssociation:1, WiFiLAN:1, QoS:1, IPPing:1), VoiceService:1.0[1](SIPSIPEndpoint:1, TAEndpoint:1)</Value>
+</ParameterValueStruct>
+     <ParameterValueStruct>      <Name>InternetGatewayDevice.ManagementServer.ConnectionRequestURL</Name>
+      <Value xsi:type="xsd:string">http://10.0.0.2:51005/</Value>
+</ParameterValueStruct>
+     <ParameterValueStruct>      <Name>InternetGatewayDevice.ManagementServer.ParameterKey</Name>
+      <Value xsi:type="xsd:string"></Value>
+</ParameterValueStruct>
+</ParameterList>
+</cwmp:Inform>
+ </soapenv:Body>
+</soapenv:Envelope>

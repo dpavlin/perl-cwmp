@@ -1,0 +1,6 @@
+--- 
+Fault: 
+  FaultCode: 9000
+  FaultString: Method not supported
+ID: 226_THOM_TR69_ID
+_trigger: Fault

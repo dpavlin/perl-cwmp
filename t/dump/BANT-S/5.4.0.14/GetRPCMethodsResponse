@@ -1,0 +1,28 @@
+POST / HTTP/1.1
+Host: 10.0.0.1
+User-Agent: Thomson_cwmp-engine/r0.3
+Content-Length: 938
+Content-Type: text/xml; charset=ISO-8859-1
+Cookie: $Version="0"; ID=THOM_CPE_ALC_ID_387;$Path=/
+SOAPAction: 
+
+<soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+ <soapenv:Header>
+<cwmp:ID soapenv:mustUnderstand="1">THOM_CPE_ALC_ID_388</cwmp:ID>
+<cwmp:NoMoreRequests soapenv:mustUnderstand="0">1</cwmp:NoMoreRequests>
+ </soapenv:Header>
+ <soapenv:Body>
+<cwmp:GetRPCMethodsResponse>
+<MethodList soap:arrayType="string[08]">
+<string>GetRPCMethods</string>
+<string>Download</string>
+<string>Upload</string>
+<string>GetParameterNames</string>
+<string>GetParameterValues</string>
+<string>SetParameterValues</string>
+<string>Reboot</string>
+<string>FactoryReset</string>
+</MethodList>
+</cwmp:GetRPCMethodsResponse>
+ </soapenv:Body>
+</soapenv:Envelope>

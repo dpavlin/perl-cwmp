@@ -1,0 +1,10 @@
+--- 
+ID: 218_THOM_TR69_ID
+Parameter: 
+  InternetGatewayDevice.DeviceInfo.SerialNumber: CP0644JTHJ4
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Date: 0001-01-01T00:00:00Z
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Description: Factory Defaults
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Name: Routed PPPoE on 8/35
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Version: ~
+  InternetGatewayDevice.DeviceInfo.X_000E50_Country: ~
+_trigger: ParameterValue

@@ -1,0 +1,26 @@
+--- 
+CurrentTime: 1970-01-01T00:02:13Z
+DeviceID: 
+  Manufacturer: THOMSON
+  OUI: 00147F
+  ProductClass: SpeedTouch 706
+  SerialNumber: CP0636JT3SH
+EventStruct: 
+  - 2 PERIODIC
+ID: THOM_CPE_ALC_ID_9
+MaxEnvelopes: 2
+Parameter: 
+  .ExternalIPAddress: 10.0.0.1
+  InternetGatewayDevice.DeviceInfo.HardwareVersion: BANT-S
+  InternetGatewayDevice.DeviceInfo.ProvisioningCode: SKYN_PLUS
+  InternetGatewayDevice.DeviceInfo.SoftwareVersion: 5.4.0.14
+  InternetGatewayDevice.DeviceInfo.SpecVersion: 1
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Date: Configuration modified b
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Description: Factory Defaults
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Name: Routed PPPoE on 0/35 and 8/35
+  InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Version: ~
+  InternetGatewayDevice.ManagementServer.ConnectionRequestURL: http://10.0.0.1:51005/
+  InternetGatewayDevice.ManagementServer.ParameterKey: ~
+RetryCount: 00
+_dispatch: InformResponse
+_trigger: Inform

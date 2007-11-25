@@ -1,0 +1,15 @@
+--- 
+ID: 218_THOM_TR69_ID
+MethodList: 
+  - GetRPCMethods
+  - GetParameterNames
+  - GetParameterValues
+  - GetParameterAttributes
+  - SetParameterValues
+  - SetParameterAttributes
+  - AddObject
+  - DeleteObject
+  - Download
+  - Reboot
+  - FactoryReset
+_trigger: GetRPCMethodsResponse

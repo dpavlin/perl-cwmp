@@ -1,0 +1,26 @@
+POST / HTTP/1.1
+Host: 10.0.0.1
+User-Agent: Thomson_cwmp-engine/r0.3
+Content-Length: 837
+Content-Type: text/xml; charset=ISO-8859-1
+Cookie: $Version="0"; ID=THOM_CPE_ALC_ID_392;$Path=/
+SOAPAction: 
+
+<soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+ <soapenv:Header>
+<cwmp:ID soapenv:mustUnderstand="1">THOM_CPE_ALC_ID_393</cwmp:ID>
+<cwmp:NoMoreRequests soapenv:mustUnderstand="0">1</cwmp:NoMoreRequests>
+ </soapenv:Header>
+ <soapenv:Body>
+  <soapenv:Fault>
+   <faultcode>Client</faultcode>
+   <faultstring>CWMP fault</faultstring>
+   <detail>
+    <cwmp:Fault>
+     <FaultCode>9000</FaultCode>
+     <FaultString>Method not supported</FaultString>
+    </cwmp:Fault>
+   </detail>
+  </soapenv:Fault>
+ </soapenv:Body>
+</soapenv:Envelope>

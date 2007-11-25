@@ -1,0 +1,23 @@
+--- 
+CurrentTime: 1970-01-01T00:02:16Z
+DeviceID: 
+  Manufacturer: THOMSON
+  OUI: 00147F
+  ProductClass: SpeedTouch 780
+  SerialNumber: CP0644JTHJ4
+EventStruct: 
+  - 2 PERIODIC
+ID: 3_THOM_TR69_ID
+MaxEnvelopes: 2
+Parameter: 
+  .ExternalIPAddress: 10.0.0.2
+  InternetGatewayDevice.DeviceInfo.HardwareVersion: BANT-R
+  InternetGatewayDevice.DeviceInfo.ProvisioningCode: test provision
+  InternetGatewayDevice.DeviceInfo.SoftwareVersion: 7.4.1.7
+  InternetGatewayDevice.DeviceInfo.SpecVersion: 1.0
+  InternetGatewayDevice.DeviceSummary: InternetGatewayDevice:1.3[](Baseline:1, EthernetLAN:1, ADSLWAN:1, EthernetWAN:1, Bridging:1, Time:1, DeviceAssociation:1, WiFiLAN:1, QoS:1, IPPing:1), VoiceService:1.0[1](SIPSIPEndpoint:1, TAEndpoint:1)
+  InternetGatewayDevice.ManagementServer.ConnectionRequestURL: http://10.0.0.2:51005/
+  InternetGatewayDevice.ManagementServer.ParameterKey: ~
+RetryCount: 00
+_dispatch: InformResponse
+_trigger: Inform

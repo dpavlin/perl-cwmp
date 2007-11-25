@@ -1,0 +1,14 @@
+--- 
+ID: THOM_CPE_ALC_ID_385
+ParameterInfo: 
+  InternetGatewayDevice.DeviceInfo.AdditionalHardwareVersion: 0
+  InternetGatewayDevice.DeviceInfo.HardwareVersion: 0
+  InternetGatewayDevice.DeviceInfo.Manufacturer: 0
+  InternetGatewayDevice.DeviceInfo.ManufacturerOUI: 0
+  InternetGatewayDevice.DeviceInfo.ModelName: 0
+  InternetGatewayDevice.DeviceInfo.ProvisioningCode: 1
+  InternetGatewayDevice.DeviceInfo.SerialNumber: 0
+  InternetGatewayDevice.DeviceInfo.SoftwareVersion: 0
+  InternetGatewayDevice.DeviceInfo.SpecVersion: 0
+  InternetGatewayDevice.DeviceInfo.Uptime: 0
+_trigger: GetParameterNamesResponse

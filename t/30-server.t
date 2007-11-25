@@ -4,7 +4,7 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 135;
+use Test::More tests => 144;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use File::Find;

@@ -1,0 +1,12 @@
+--- 
+ID: THOM_CPE_ALC_ID_388
+MethodList: 
+  - GetRPCMethods
+  - Download
+  - Upload
+  - GetParameterNames
+  - GetParameterValues
+  - SetParameterValues
+  - Reboot
+  - FactoryReset
+_trigger: GetRPCMethodsResponse

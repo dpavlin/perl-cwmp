@@ -1,0 +1,78 @@
+POST / HTTP/1.1
+Host: 10.0.0.1
+User-Agent: Thomson_cwmp-engine/r0.3
+Content-Length: 2945
+Content-Type: text/xml; charset=ISO-8859-1
+SOAPAction: 
+
+<soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+ <soapenv:Header>
+<cwmp:ID soapenv:mustUnderstand="1">THOM_CPE_ALC_ID_9</cwmp:ID>
+<cwmp:NoMoreRequests soapenv:mustUnderstand="0">1</cwmp:NoMoreRequests>
+ </soapenv:Header>
+ <soapenv:Body>
+<cwmp:Inform>
+<DeviceId>
+ <Manufacturer>THOMSON</Manufacturer>
+ <OUI>00147F</OUI>
+ <ProductClass>SpeedTouch 706</ProductClass>
+ <SerialNumber>CP0636JT3SH</SerialNumber>
+</DeviceId>
+<Event soap:arrayType="cwmp:EventStruct[01]">
+<EventStruct>
+ <EventCode>2 PERIODIC</EventCode>
+ <CommandKey></CommandKey>
+</EventStruct>
+</Event>
+<MaxEnvelopes>2</MaxEnvelopes>
+<CurrentTime>1970-01-01T00:02:13Z</CurrentTime>
+<RetryCount>00</RetryCount>
+<ParameterList soap:arrayType="cwmp:ParameterValueStruct[11]">
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.DeviceInfo.SpecVersion</Name>
+ <Value xsi:type="xsd:string">1</Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.DeviceInfo.HardwareVersion</Name>
+ <Value xsi:type="xsd:string">BANT-S</Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.DeviceInfo.SoftwareVersion</Name>
+ <Value xsi:type="xsd:string">5.4.0.14</Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</Name>
+ <Value xsi:type="xsd:string">SKYN_PLUS</Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Name</Name>
+ <Value xsi:type="xsd:string">Routed PPPoE on 0/35 and 8/35</Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Version</Name>
+ <Value xsi:type="xsd:string"></Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Date</Name>
+ <Value xsi:type="xsd:string">Configuration modified b</Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Description</Name>
+ <Value xsi:type="xsd:string">Factory Defaults</Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.ManagementServer.ConnectionRequestURL</Name>
+ <Value xsi:type="xsd:string">http://10.0.0.1:51005/</Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>InternetGatewayDevice.ManagementServer.ParameterKey</Name>
+ <Value xsi:type="xsd:string"></Value>
+</ParameterValueStruct>
+<ParameterValueStruct>
+ <Name>.ExternalIPAddress</Name>
+ <Value xsi:type="xsd:string">10.0.0.1</Value>
+</ParameterValueStruct>
+</ParameterList>
+</cwmp:Inform>
+ </soapenv:Body>
+</soapenv:Envelope>
