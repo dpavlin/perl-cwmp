@@ -11,6 +11,7 @@ use Data::Dump qw/dump/;
 use File::Slurp;
 use blib;
 use CWMP::Request;
+use YAML::Syck;
 
 my $path = shift @ARGV || die "usage: $0 dump/client_ip/\n";
 
@@ -37,14 +38,19 @@ warn "## requests = ",dump( $requests );
 
 my $test_path = 't/dump/';
 
+sub xml2state {
+	my $xml = shift;
+	$xml =~ s/^.*?</</s;
+	return CWMP::Request->parse( $xml );
+}
+
 if ( my $i = $requests->{Inform} ) {
 
 	my $xml = read_file($i);
-	$xml =~ s/^.*?</</s;
 
 #	warn "## xml: $xml\n";
 
-	my $state = CWMP::Request->parse( $xml );
+	my $state = xml2state( $xml );
 
 #	warn "## state = ",dump( $state );
 
@@ -67,6 +73,8 @@ foreach my $name ( keys %$requests ) {
 	my $to   = "$test_path/$name";
 	warn "## $from -> $to\n";
 	next if -e $to;
-	write_file( $to, read_file( $from ) );
+	my $xml = read_file( $from );
+	write_file( $to, $xml );
+	DumpFile( "$to.yml", xml2state( $xml ) );
 	warn "created $to\n";
 }

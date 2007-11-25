@@ -32,6 +32,8 @@ my $path;
 
 my $debug = 0;
 
+my $cleaned = 0;
+
 sub open {
 	my $self = shift;
 
@@ -47,12 +49,13 @@ sub open {
 	if ( ! -e $path ) {
 		mkdir $path || die "can't create $path: $!";
 		warn "created $path directory\n" if $debug;
-	} elsif ( $args->{clean} ) {
+	} elsif ( $args->{clean} && ! $cleaned ) {
 		warn "removed old $path\n" if $debug;
 		foreach my $uid ( $self->all_uids ) {
 			my $file = $self->file( $uid );
 			unlink $file || die "can't remove $file: $!";
 		}
+		$cleaned++;
 	}
 
 

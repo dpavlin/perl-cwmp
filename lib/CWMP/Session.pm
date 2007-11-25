@@ -106,7 +106,7 @@ sub process_request {
 	my $r = $sock->get_request;
 	
 	if ( ! $r ) {
-		carp "can't get_request";
+		warn "WARNING: can't get_request\n";
 		return 0;
 	}
 
@@ -146,8 +146,13 @@ sub process_request {
 		warn "## acquired state = ", dump( $state ), "\n" if $self->debug;
 
 		if ( ! defined( $state->{DeviceID} ) ) {
-			warn "## state with DeviceID, using old one...\n";
-			$state->{DeviceID} = $self->state->{DeviceID};
+			if ( $self->state ) {
+				warn "## state without DeviceID, using old one...\n";
+				$state->{DeviceID} = $self->state->{DeviceID};
+			} else {
+				warn "WARNING: state without DeviceID, and I don't have old one!\n";
+				warn "## state = ",dump( $state );
+			}
 		}
 
 		$self->state( $state );

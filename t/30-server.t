@@ -4,15 +4,20 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 20;
+use Test::More tests => 135;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
+use File::Find;
+use File::Slurp;
+use File::Path qw/rmtree mkpath/;
+use YAML::Syck;
 use blib;
 
 BEGIN {
 	use_ok('Net::HTTP');
 	use_ok('CWMP::Server');
 	use_ok('CWMP::Store');
+	use_ok('CWMP::Request');
 }
 
 my $port = 4242;
@@ -26,8 +31,10 @@ ok(my $abs_path = abs_path($0), "abs_path");
 $abs_path =~ s!/[^/]*$!/!;	#!fix-vim
 
 my $store_path = "$abs_path/var/";
-#my $store_module = 'DBMDeep';
 my $store_module = 'YAML';
+
+rmtree $store_path if -e $store_path;
+ok( mkpath $store_path, "mkpath $store_path" );
 
 ok( my $server = CWMP::Server->new({
 	debug => $debug,
@@ -36,7 +43,7 @@ ok( my $server = CWMP::Server->new({
 		store => {
 			module => $store_module,
 			path => $store_path,
-			clean => 1,
+#			clean => 1,
 		},
 		create_dump => 0,
 	}
@@ -58,143 +65,104 @@ if ( $pid = fork ) {
 
 sleep 1;	# so server can start
 
-ok( my $s = Net::HTTP->new(Host => "localhost:$port"), 'client' );
-$s->keep_alive( 1 );
+my $s;
 
-ok( $s->write_request(
-	POST => '/',
-	'Transfer-Encoding' => 'chunked',
-	'SOAPAction' => '',
-	'Content-Type' => 'text/xml',
-), 'write_request' );
-
-foreach my $chunk (qq{
-
-<soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
- <soapenv:Header>
-<cwmp:ID soapenv:mustUnderstand="1">1_THOM_TR69_ID</cwmp:ID>
- </soapenv:Header>
- <soapenv:Body>
-<cwmp:Inform>
-<DeviceId>
- <Manufacturer>THOMSON</Manufacturer>
- <OUI>00147F</OUI>
- <ProductClass>SpeedTouch 780</ProductClass>
- <SerialNumber>CP0644JTHJ4</SerialNumber>
-</DeviceId>
-<Event soap:arrayType="cwmp:EventStruct[03]">
-<EventStruct>
- <EventCode>0 BOOTSTRAP</EventCode>
- <CommandKey></CommandKey>
-</EventStruct>
-<EventStruct>
- <Event},qq{Code>1 BOOT</EventCode>
- <CommandKey></CommandKey>
-</EventStruct>
-<EventStruct>
- <EventCode>4 VALUE CHANGE</EventCode>
- <CommandKey></CommandKey>
-</EventStruct>
-</Event>
-<MaxEnvelopes>2</MaxEnvelopes>
-<CurrentTime>1970-01-01T00:04:33Z</CurrentTime>
-<RetryCount>01</RetryCount>},qq{
-<ParameterList soap:arrayType="cwmp:ParameterValueStruct[12]">
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.DeviceSummary</Name>
- <Value xsi:type="xsd:string">InternetGatewayDevice:1.1[] (Baseline:1, EthernetLAN:1, ADSLWAN:1, Bridging:1, Time:1, WiFiLAN:1)</Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>}, qq{
-InternetGatewayDevice.DeviceInfo.SpecVersion</Name>
- <Value xsi:type="xsd:string">1.1</Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.DeviceInfo.HardwareVersion</Name>
- <Value xsi:type="xsd:string">BANT-R</Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.DeviceInfo.SoftwareVersion</Name>
- <Value xsi:type="xsd:string">6.2.15.5</Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</Name>
- <Value xsi:type="xsd:string"></Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Name</Name>
- <Value xsi:type="xsd:string">Routed PPPoE on 0/35 and 8/35</Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Version</Name>
- <Value xsi:type="xsd:string"></Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Date</Name>
- <Value xsi:type="xsd:dateTime">0000-00-00T00:00:00</Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Description</Name>
- <Value xsi:type="xsd:string">Factory Defaults</Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.ManagementServer.ConnectionRequestURL</Name>
- <Value}, qq{ xsi:type="xsd:string">http://192.168.1.254:51005/</Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>InternetGatewayDevice.ManagementServer.ParameterKey</Name>
- <Value xsi:type="xsd:string"></Value>
-</ParameterValueStruct>
-<ParameterValueStruct>
- <Name>.ExternalIPAddress</Name>
- <Value xsi:type="xsd:string">192.168.1.254</Value>
-</ParameterValueStruct>
-</ParameterList>
-</cwmp:Inform>
- </soapenv:Body>
-</soapenv:Envelope>
-} ) {
-	ok( $s->write_chunk( $chunk ), "chunk " . length($chunk) . " bytes" );
+sub cpe_connect {
+	return $s if $s;
+	diag "CPE connect";
+	ok( $s = Net::HTTP->new(Host => "localhost:$port"), 'CPE client' );
+	$s->keep_alive( 1 );
 }
-ok( $s->write_chunk_eof, 'write_chunk_eof' );
 
-sleep 1;
+sub cpe_disconnect {
+	return unless $s;
+	diag "CPE disconnect";
+	$s->keep_alive( 0 );
+	ok( $s->write_request(
+		POST => '/',
+		'SOAPAction' => '',
+		'Content-Type' => 'text/xml',
+	), 'write_request' );
+	my ($code, $mess, %h) = $s->read_response_headers;
+	undef $s;
+	diag "$code $mess";
+	return $code == 200 ? 1 : 0;
+}
 
-ok( my $store = CWMP::Store->new({ module => $store_module, path => $store_path, debug => $debug }), 'another store' );
+sub test_request {
+	my $path = shift;
 
-my $state = {
-  CurrentTime    => "1970-01-01T00:04:33Z",
-  DeviceID       => {
-                      Manufacturer => "THOMSON",
-                      OUI => "00147F",
-                      ProductClass => "SpeedTouch 780",
-                      SerialNumber => "CP0644JTHJ4",
-                    },
-  EventStruct    => ["0 BOOTSTRAP", "1 BOOT", "4 VALUE CHANGE"],
-  ID             => "1_THOM_TR69_ID",
-  MaxEnvelopes   => 2,
-#  NoMoreRequests => undef,
-  Parameter      => {
-                      "\nInternetGatewayDevice.DeviceInfo.SpecVersion"                  => "1.1",
-                      ".ExternalIPAddress"                                              => "192.168.1.254",
-                      "InternetGatewayDevice.DeviceInfo.HardwareVersion"                => "BANT-R",
-                      "InternetGatewayDevice.DeviceInfo.ProvisioningCode"               => undef,
-                      "InternetGatewayDevice.DeviceInfo.SoftwareVersion"                => "6.2.15.5",
-                      "InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Date"        => "0000-00-00T00:00:00",
-                      "InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Description" => "Factory Defaults",
-                      "InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Name"        => "Routed PPPoE on 0/35 and 8/35",
-                      "InternetGatewayDevice.DeviceInfo.VendorConfigFile.1.Version"     => undef,
-                      "InternetGatewayDevice.DeviceSummary"                             => "InternetGatewayDevice:1.1[] (Baseline:1, EthernetLAN:1, ADSLWAN:1, Bridging:1, Time:1, WiFiLAN:1)",
-                      "InternetGatewayDevice.ManagementServer.ConnectionRequestURL"     => "http://192.168.1.254:51005/",
-                      "InternetGatewayDevice.ManagementServer.ParameterKey"             => undef,
-                    },
-  RetryCount     => "01",
-  _dispatch      => "InformResponse",
-};
+	ok( -e $path, $path );
 
-ok( my $store_state = $store->current_store->get_state( 'CP0644JTHJ4' ), 'get_state' );
+	cpe_disconnect if $path =~ m/Inform/;
+	cpe_connect;
 
-is_deeply( $store_state, $state, 'store->current_store->get_state' );
+	ok( $s->write_request(
+		POST => '/',
+		'Transfer-Encoding' => 'chunked',
+		'SOAPAction' => '',
+		'Content-Type' => 'text/xml',
+	), 'write_request' );
+
+	my $xml = read_file( $path );
+	$xml =~ s/^.+?</</s;
+
+	my $chunk_size = 5000;
+
+	foreach my $part ( 0 .. int( length($xml) / $chunk_size ) ) {
+		my $chunk = substr( $xml, $part * $chunk_size, $chunk_size );
+		ok( $s->write_chunk( $chunk ), "chunk $part " . length($chunk) . " bytes" );
+	}
+	ok( $s->write_chunk_eof, 'write_chunk_eof' );
+
+	my($code, $mess, %h) = $s->read_response_headers;
+	diag "$code $mess";
+	while (1) {
+		my $buf;
+		my $n = $s->read_entity_body($buf, 1024);
+		die "read failed: $!" unless defined $n;
+		last unless $n;
+		diag $buf;
+	}
+
+	ok( my $store = CWMP::Store->new({ module => $store_module, path => $store_path, debug => $debug }), 'another store' );
+
+	my $state = LoadFile( "$path.yml" );
+
+	$path =~ s!/[^/]+$!!; #!vim
+	ok( my $uid = $store->state_to_uid( LoadFile( "$path/Inform.yml" ) ), 'state_to_uid' );
+
+	ok( my $store_state = $store->current_store->get_state( $uid ), 'get_state' );
+
+	my $s;
+
+	# ignore
+	foreach my $k ( keys %$state ) {
+		if ( defined( $store_state->{$k} ) ) {
+			$s->{$k} = $store_state->{$k};
+		} else {
+			die "store_state doesn't have $k: ",dump( $store_state );
+		}
+	}
+
+	is_deeply( $s, $state, 'store->current_store->get_state' );
+
+}
+
+find({
+	no_chdir => 1,
+	wanted => sub {
+		my $path = $File::Find::name;
+		return unless -f $path;
+		return if $path =~ m/\.yml$/;
+		eval {
+			test_request( $path );
+		};
+		ok( ! $@, "request $path" );
+	}
+},'t/dump/');
+
+ok( cpe_disconnect, 'cpe_disconnect' );
 
 diag "shutdown server";
 
