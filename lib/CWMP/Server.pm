@@ -91,7 +91,8 @@ package CWMP::Server::Helper;
 use warnings;
 use strict;
 
-use base qw/Net::Server/;
+#use base qw/Net::Server/;
+use base qw/Net::Server::Fork/;
 use Carp qw/confess/;
 use Data::Dump qw/dump/;
 

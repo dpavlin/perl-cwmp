@@ -3,9 +3,9 @@ use lib './lib';
 use inc::Module::Install;
 
 name		'CWMP';
-version		'0.13';
+version		'0.14';
 license		'GPL';
-requires	'Net::Server';
+requires	'Net::Server::Fork';
 requires	'HTTP::Daemon';
 requires	'XML::Rules';
 requires	'XML::Generator';
@@ -49,10 +49,10 @@ features(
 		-default => 0,
 		recommends('Test::Pod::Coverage'),
 	],
-	'Memory leak detection (for developers)' => [
-		-default => 0,
-		recommends('Devel::LeakTrace::Fast' => 0.11),
-	],
+#	'Memory leak detection (for developers)' => [
+#		-default => 0,
+#		recommends('Devel::LeakTrace::Fast' => 0.11),
+#	],
 );
 
 my_targets();

@@ -8,7 +8,7 @@ use Test::More tests => 256;
 use Data::Dump qw/dump/;
 use lib 'lib';
 
-use Devel::LeakTrace::Fast;
+#use Devel::LeakTrace::Fast;
 
 BEGIN {
 	use_ok('CWMP::Queue');

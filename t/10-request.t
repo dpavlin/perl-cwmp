@@ -10,6 +10,7 @@ use Cwd qw/abs_path/;
 use File::Slurp;
 use blib;
 
+# XML::Rules doesn't like it!
 #use Devel::LeakTrace::Fast;
 
 BEGIN {
