@@ -9,6 +9,8 @@ use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use lib 'lib';
 
+use Devel::LeakTrace::Fast;
+
 BEGIN {
 	use_ok('CWMP::Store');
 	use_ok('CWMP::Store::DBMDeep');
@@ -75,6 +77,8 @@ sub test_store {
 	ok( $store->update_state( { DeviceID => { SerialNumber => 99999 } } ), 'new device' );
 
 	is_deeply( [ $store->all_uids ], [ 123456, 99999 ], 'all_uids' );
+
+	undef $store;
 
 }
 

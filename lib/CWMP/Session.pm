@@ -189,7 +189,7 @@ sub process_request {
 	} elsif ( $job = $queue->dequeue ) {
 		$xml = $self->dispatch( $job->dispatch );
 	} elsif ( $size == 0 ) {
-		warn ">>> no more queued commands, no client pending, closing connection $to_uid";
+		warn ">>> over, closing connection $to_uid";
 		$sock->close;
 		return;
 	} else {

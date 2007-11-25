@@ -8,6 +8,8 @@ use Data::Dump qw/dump/;
 use Carp qw/confess cluck/;
 use Class::Trigger;
 
+#use Devel::LeakTrace::Fast;
+
 =head1 NAME
 
 CWMP::Request - parse SOAP request metods
