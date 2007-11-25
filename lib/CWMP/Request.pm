@@ -147,7 +147,7 @@ sub parse {
 		rules => $rules,
 	);
 
-	warn "## created $parser\n";
+#	warn "## created $parser\n";
 
 	$parser->parsestring( $xml );
 
