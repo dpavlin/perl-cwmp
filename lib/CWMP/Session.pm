@@ -19,6 +19,7 @@ use HTTP::Daemon;
 use Data::Dump qw/dump/;
 use Carp qw/carp confess cluck croak/;
 use File::Slurp;
+use File::Path qw/mkpath/;
 
 use CWMP::Request;
 use CWMP::Methods;
@@ -82,7 +83,7 @@ of requests in single session.
 
 =cut
 
-my $dump_nr = 0;
+my $dump_by_ip;
 
 sub process_request {
 	my $self = shift;
@@ -109,16 +110,19 @@ sub process_request {
 		return 0;
 	}
 
+	my $ip = $sock->peerhost || confess "can't get peerhost from sock: $!";
+
 	my $xml = $r->content;
 
 	my $size = length( $xml );
 
-	warn "<<<< ", $sock->peerhost, " [" . localtime() . "] ", $r->method, " ", $r->uri, " $size bytes\n";
+	warn "<<<< $ip [" . localtime() . "] ", $r->method, " ", $r->uri, " $size bytes\n";
 
-	$dump_nr++;
-	my $file = sprintf("dump/%04d-%s.request", $dump_nr, $sock->peerhost);
+	my $dump_nr = $dump_by_ip->{$ip}++;
+	my $file = sprintf("./dump/%s/%04d.request", $ip, $dump_nr);
 
 	if ( $self->create_dump ) {
+		mkpath "dump/$ip" unless -e "dump/$ip";
 		write_file( $file, $r->as_string );
 		warn "### request dumped to file: $file\n" if $self->debug;
 	}
@@ -133,8 +137,9 @@ sub process_request {
 
 		$state = CWMP::Request->parse( $xml );
 
-		if ( defined( $state->{_dispatch} ) && $self->create_dump ) {
-			my $type = sprintf("dump/%04d-%s-%s", $dump_nr, $sock->peerhost, $state->{_dispatch});
+		if ( defined( $state->{_trigger} ) && $self->create_dump ) {
+			my $type = sprintf("dump/%s/%04d-%s", $ip, $dump_nr, $state->{_trigger});
+			$file =~ s!^.*?([^/]+)$!$1!;	#!vim
 			symlink $file, $type || warn "can't symlink $file -> $type: $!";
 		}
 
@@ -201,7 +206,7 @@ sub process_request {
 	$sock->send( "Content-Length: " . length( $xml ) . "\r\n\r\n" );
 	$sock->send( $xml ) or die "can't send response";
 
-	warn ">>>> " . $sock->peerhost . " [" . localtime() . "] sent ", length( $xml )," bytes $to_uid";
+	warn ">>>> " . $ip . " [" . localtime() . "] sent ", length( $xml )," bytes $to_uid";
 
 	$job->finish if $job;
 	warn "### request over for $uid\n" if $self->debug;
@@ -230,7 +235,9 @@ sub dispatch {
 		my $xml = $response->$dispatch( $self->state, $args );
 		warn "## response payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
 		if ( $self->create_dump ) {
-			my $file = sprintf("dump/%04d-%s.response", $dump_nr++, $self->sock->peerhost);
+			my $ip = $self->sock->peerhost || confess "can't get sock->peerhost: $!";
+			my $dump_nr = $dump_by_ip->{$ip}++;
+			my $file = sprintf("dump/%s/%04d.response", $ip, $dump_nr );
 			write_file( $file, $xml );
 			warn "### response dump: $file\n" if $self->debug;
 		}

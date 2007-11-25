@@ -157,8 +157,8 @@ sub parse {
 		warn "### call_trigger( $trigger )\n";
 		$self->call_trigger( $trigger, $state );
 	}
-	# XXX don't propagate _trigger (useful?)
-	delete( $state->{_trigger} );
+	# XXX propagate _trigger (useful for symlinks)
+
 	return $state;
 }
 
