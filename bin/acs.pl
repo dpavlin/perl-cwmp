@@ -14,7 +14,7 @@ use Getopt::Long;
 use Data::Dump qw/dump/;
 use File::Find;
 
-use Devel::LeakTrace::Fast;
+#use Devel::LeakTrace::Fast;
 
 my $port = 3333;
 my $debug = 0;

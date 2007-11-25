@@ -15,8 +15,6 @@ requires	'Class::Accessor';
 requires	'Net::HTTP';
 requires	'Cwd';
 requires	'File::Slurp';
-requires	'DBM::Deep';
-requires	'Clone';	# CWMP::Store::DBMDeep
 requires	'Getopt::Long';
 #requires	'Term::Shelly'	=>	'0.03';
 requires	'Module::Pluggable';

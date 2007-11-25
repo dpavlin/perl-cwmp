@@ -126,7 +126,14 @@ push @$rules,
 
 =cut
 
-my $parser = XML::Rules->new(
+sub parse {
+	my $self = shift;
+
+	my $xml = shift || confess "no xml?";
+
+	$state = {};
+
+	my $parser = XML::Rules->new(
 #		start_rules => [
 #			'^division_name,fax' => 'skip',
 #		],
@@ -138,16 +145,14 @@ my $parser = XML::Rules->new(
 			'urn:dslforum-org:cwmp-1-0' => '',
 		},
 		rules => $rules,
-);
+	);
 
-sub parse {
-	my $self = shift;
-
-	my $xml = shift || confess "no xml?";
-
-	$state = {};
+	warn "## created $parser\n";
 
 	$parser->parsestring( $xml );
+
+	undef $parser;
+
 	if ( my $trigger = $state->{_trigger} ) {
 		warn "### call_trigger( $trigger )\n";
 		$self->call_trigger( $trigger, $state );

@@ -7,6 +7,8 @@ my $debug = shift @ARGV;
 use Test::More tests => 4;
 use blib;
 
+#use Devel::LeakTrace::Fast;
+
 BEGIN {
 	use_ok('CWMP::Server');
 	use_ok('CWMP::Request');

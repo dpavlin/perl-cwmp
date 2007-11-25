@@ -4,7 +4,7 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 47;
+use Test::More tests => 32;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use lib 'lib';
@@ -13,7 +13,6 @@ use lib 'lib';
 
 BEGIN {
 	use_ok('CWMP::Store');
-	use_ok('CWMP::Store::DBMDeep');
 	use_ok('CWMP::Store::YAML');
 	use_ok('CWMP::Store::JSON');
 }
@@ -79,13 +78,10 @@ sub test_store {
 
 	is_deeply( [ $store->all_uids ], [ 123456, 99999 ], 'all_uids' );
 
-	undef $store;
-
 }
 
 # now test all stores
 
-test_store('DBMDeep');
 test_store('YAML');
 test_store('JSON');
 

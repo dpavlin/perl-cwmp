@@ -7,6 +7,8 @@ use warnings;
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 id
+dir
+clean
 debug
 
 / );
@@ -14,10 +16,12 @@ debug
 #use Carp qw/confess/;
 use Data::Dump qw/dump/;
 use File::Spec;
-use File::Path qw/mkpath/;
+use File::Path qw/mkpath rmtree/;
 use IPC::DirQueue;
-use YAML qw/Dump/;
+use YAML::Syck qw/Dump/;
 use Carp qw/confess/;
+
+#use Devel::LeakTrace::Fast;
 
 =head1 NAME
 
@@ -29,6 +33,8 @@ CWMP::Queue - implement commands queue for CPE
 
   my $obj = CWMP::Queue->new({
   	id => 'CPE_serial_number',
+	dir => 'queue',
+	clean => 1,
 	debug => 1
   });
 
@@ -42,7 +48,12 @@ sub new {
 
 	warn "created ", __PACKAGE__, "(", dump( @_ ), ") object\n" if $self->debug;
 
-	my $dir = File::Spec->catfile('queue',$self->id);
+	my $dir = File::Spec->catfile( $self->dir || 'queue', $self->id );
+
+	if ( -e $dir && $self->clean ) {
+		rmtree $dir || die "can't remove $dir: $!";
+		warn "## clean $dir\n" if $self->debug;
+	}
 
 	if ( ! -e $dir ) {
 		mkpath $dir || die "can't create $dir: $!";
@@ -161,6 +172,7 @@ Finish job and remove it from queue
 sub finish {
 	my $self = shift;
 	$self->job->finish;
+	return 1;
 }
 
 1;

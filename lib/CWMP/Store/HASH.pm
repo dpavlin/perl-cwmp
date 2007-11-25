@@ -55,7 +55,7 @@ sub open {
 
 =head2 update_uid_state
 
-  $store->update_uid_state( $uid, $state );
+  my $new_state = $store->update_uid_state( $uid, $state );
 
 =cut
 
@@ -72,6 +72,7 @@ sub update_uid_state {
 
 	$self->save_hash( $file, $combined ) || die "can't write $file: $!";
 
+	return $combined;
 }
 
 =head2 get_state
