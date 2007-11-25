@@ -108,7 +108,7 @@ sub all_uids {
 	my $self = shift;
 
 	my $ext = $self->extension;
-	warn "## extension: $ext";
+	#warn "## extension: $ext";
 
 	opendir(my $d, $path) || die "can't opendir $path: $!";
 	my @uids = grep { $_ =~ m/\Q$ext\E$/ && -f "$path/$_" } readdir($d);
