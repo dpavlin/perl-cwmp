@@ -1,5 +1,4 @@
-# Dobrica Pavlinusic, <dpavlin@rot13.org> 10/26/07 21:37:12 CEST
-package CWMP::Store::YAML;
+package CWMP::Store::JSON;
 
 use strict;
 use warnings;
@@ -7,7 +6,8 @@ use warnings;
 use CWMP::Store::HASH;
 use base qw/CWMP::Store::HASH/;
 
-use YAML::Syck;
+use JSON::XS;
+use File::Slurp;
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ my $full_path;
 
 sub full_path {
 	my ( $self, $path ) = @_;
-	$full_path = "$path/yaml";
+	$full_path = "$path/json";
 	warn "## full_path: $full_path";
 	return $full_path;
 }
@@ -33,14 +33,14 @@ sub file {
 
 sub save_hash {
 	my ( $self, $file, $hash ) = @_;
-	DumpFile( $file, $hash );
+	write_file( $file, to_json $hash );
 }
 
 sub load_hash {
 	my ( $self, $file ) = @_;
-	LoadFile( $file );
+	from_json read_file( $file );
 }
 
-sub extension { '.yml' };
+sub extension { '.js' };
 
 1;

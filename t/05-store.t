@@ -4,17 +4,18 @@ use warnings;
 
 my $debug = shift @ARGV;
 
-use Test::More tests => 32;
+use Test::More tests => 47;
 use Data::Dump qw/dump/;
 use Cwd qw/abs_path/;
 use lib 'lib';
 
-use Devel::LeakTrace::Fast;
+#use Devel::LeakTrace::Fast;
 
 BEGIN {
 	use_ok('CWMP::Store');
 	use_ok('CWMP::Store::DBMDeep');
 	use_ok('CWMP::Store::YAML');
+	use_ok('CWMP::Store::JSON');
 }
 
 ok(my $abs_path = abs_path($0), "abs_path");
@@ -86,4 +87,5 @@ sub test_store {
 
 test_store('DBMDeep');
 test_store('YAML');
+test_store('JSON');
 
