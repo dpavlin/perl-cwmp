@@ -219,6 +219,20 @@ sub Reboot {
 	});
 }
 
+=head2 FactoryReset
+
+  $method->FactoryReset( $state );
+
+=cut
+
+sub FactoryReset {
+	my ( $self, $state ) = @_;
+	$self->xml( $state, sub {
+		my ( $X, $state ) = @_;
+		$X->FactoryReset();
+	});
+}
+
 
 =head1 Server methods
 
