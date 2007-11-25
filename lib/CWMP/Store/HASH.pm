@@ -3,6 +3,11 @@ package CWMP::Store::HASH;
 use strict;
 use warnings;
 
+use Exporter 'import';
+our @EXPORT = qw/
+	$debug
+/;
+
 use Data::Dump qw/dump/;
 use Hash::Merge qw/merge/;
 use Carp qw/confess/;

@@ -20,14 +20,14 @@ my $full_path;
 sub full_path {
 	my ( $self, $path ) = @_;
 	$full_path = "$path/json";
-	warn "## full_path: $full_path";
+	warn "## full_path: $full_path" if $debug;
 	return $full_path;
 }
 
 sub file {
 	my ( $self, $uid ) = @_;
 	my $file = "$full_path/$uid" . $self->extension;
-	warn "## file -> $file";
+	warn "## file -> $file" if $debug;
 	return $file;
 }
 
