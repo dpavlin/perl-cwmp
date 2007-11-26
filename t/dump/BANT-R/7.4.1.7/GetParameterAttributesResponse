@@ -1,0 +1,27 @@
+POST / HTTP/1.1
+Host: 10.0.0.100
+User-Agent: Thomson_cwmp-engine/r7.4.1.7
+Content-Length: 1184
+Content-Type: text/xml; charset=ISO-8859-1
+Cookie: $Version="0"; ID=11_THOM_TR69_ID;$Path=/
+SOAPAction: 
+
+<soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+ <soapenv:Header>
+<cwmp:ID soapenv:mustUnderstand="1">11_THOM_TR69_ID</cwmp:ID>
+ </soapenv:Header>
+ <soapenv:Body>
+  <cwmp:GetParameterAttributesResponse>   <ParameterList soap:arrayType="cwmp:ParameterAttributeStruct[02]">    <ParameterAttributeStruct>     <Name>InternetGatewayDevice.DeviceInfo.SerialNumber</Name>
+     <Notification>0</Notification>
+     <AccessList soap:arrayType="cwmp:string[01]">      <string>subscriber</string>
+</AccessList>
+</ParameterAttributeStruct>
+    <ParameterAttributeStruct>     <Name>InternetGatewayDevice.DeviceInfo.SoftwareVersion</Name>
+     <Notification>0</Notification>
+     <AccessList soap:arrayType="cwmp:string[01]">      <string>subscriber</string>
+</AccessList>
+</ParameterAttributeStruct>
+</ParameterList>
+</cwmp:GetParameterAttributesResponse>
+ </soapenv:Body>
+</soapenv:Envelope>

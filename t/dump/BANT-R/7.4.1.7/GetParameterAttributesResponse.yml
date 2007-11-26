@@ -1,0 +1,12 @@
+--- 
+ID: 11_THOM_TR69_ID
+ParameterAttribute: 
+  InternetGatewayDevice.DeviceInfo.SerialNumber: 
+    AccessList: 
+      - subscriber
+    Notification: 0
+  InternetGatewayDevice.DeviceInfo.SoftwareVersion: 
+    AccessList: 
+      - subscriber
+    Notification: 0
+_trigger: GetParameterAttributesResponse

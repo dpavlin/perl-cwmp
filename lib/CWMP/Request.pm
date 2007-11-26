@@ -108,9 +108,20 @@ push @$rules,
 =cut
 
 push @$rules,
-		'GetParameterAttributesResponse' => sub {
+		'ParameterAttributeStruct' => sub {
 			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
 			warn dump( $tag_name, $tag_hash, $context );
+	
+			confess "need state" unless ( $state );	# don't remove!
+
+			my $name = _tag($tag_hash, 'Name', '_content');
+
+
+			$state->{ParameterAttribute}->{$name} = {
+				Notification => _tag($tag_hash, 'Notification', '_content' ),
+				AccessList => _tag($tag_hash, 'AccessList', 'string' ),
+			};
+
 			$state->{_trigger} = 'GetParameterAttributesResponse';
 		};
 
