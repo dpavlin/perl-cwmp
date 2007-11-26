@@ -103,6 +103,17 @@ push @$rules,
 			$state->{_trigger} = 'GetParameterNamesResponse';
 		};
 	
+=head2 GetParameterAttributesResponse
+
+=cut
+
+push @$rules,
+		'GetParameterAttributesResponse' => sub {
+			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
+			warn dump( $tag_name, $tag_hash, $context );
+			$state->{_trigger} = 'GetParameterAttributesResponse';
+		};
+
 =head2 Fault
 
 =cut
