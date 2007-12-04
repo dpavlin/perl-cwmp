@@ -71,8 +71,11 @@ warn "dumping new tests into $test_path\n";
 foreach my $name ( keys %$requests ) {
 	my $from = $requests->{$name};
 	my $to   = "$test_path/$name";
+	if ( -e $to ) {
+		warn "SKIP $to\n";
+		next;
+	}
 	warn "## $from -> $to\n";
-	next if -e $to;
 	my $xml = read_file( $from );
 	write_file( $to, $xml );
 	DumpFile( "$to.yml", xml2state( $xml ) );
