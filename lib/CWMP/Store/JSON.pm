@@ -33,12 +33,12 @@ sub file {
 
 sub save_hash {
 	my ( $self, $file, $hash ) = @_;
-	write_file( $file, to_json $hash );
+	write_file( $file, encode_json $hash );
 }
 
 sub load_hash {
 	my ( $self, $file ) = @_;
-	from_json read_file( $file );
+	decode_json read_file( $file );
 }
 
 sub extension { '.js' };

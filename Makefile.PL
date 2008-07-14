@@ -34,7 +34,7 @@ features(
 	],
 	'CWMP::Store::JSON' => [
 		-default => 1,
-		'JSON::XS',
+		'JSON::XS' => 2.0,
 	],
 	'Command-line access to modems (tcli.pl)' => [
 		-default => 1,
