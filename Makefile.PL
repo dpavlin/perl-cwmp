@@ -30,28 +30,28 @@ build_requires 'Test::More';
 features(
 	'CWMP::Store::YAML' => [
 		-default => 1,
-		recommends('YAML::Syck' => 0.91),
+		'YAML::Syck' => 0.91,
 	],
 	'CWMP::Store::JSON' => [
 		-default => 1,
-		recommends('JSON::XS'),
+		'JSON::XS',
 	],
 	'Command-line access to modems (tcli.pl)' => [
 		-default => 1,
-		recommends('Expect'),
-		recommends('Net::Telnet'),
+		'Expect',
+		'Net::Telnet',
 	],
 	'HTML documentation (make html)' => [
 		-default => 0,
-		recommends('Pod::Xhtml'),
+		'Pod::Xhtml',
 	],
 	'Pod coverage tests (for developers)' => [
 		-default => 0,
-		recommends('Test::Pod::Coverage'),
+		'Test::Pod::Coverage',
 	],
 #	'Memory leak detection (for developers)' => [
 #		-default => 0,
-#		recommends('Devel::LeakTrace::Fast' => 0.11),
+#		'Devel::LeakTrace::Fast' => 0.11,
 #	],
 );
 
