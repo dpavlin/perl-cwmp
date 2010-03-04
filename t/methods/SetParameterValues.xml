@@ -8,16 +8,14 @@
   <soap:Body>
     <cwmp:SetParameterValues>
       <cwmp:ParameterList>
-        <cwmp:ParameterNames>
-          <cwmp:ParameterValueStruct>
-            <cwmp:Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</cwmp:Name>
-            <cwmp:Value>test provision</cwmp:Value>
-          </cwmp:ParameterValueStruct>
-          <cwmp:ParameterValueStruct>
-            <cwmp:Name>InternetGatewayDevice.DeviceInfo.X_000E50_Country</cwmp:Name>
-            <cwmp:Value>42</cwmp:Value>
-          </cwmp:ParameterValueStruct>
-        </cwmp:ParameterNames>
+        <cwmp:ParameterValueStruct>
+          <cwmp:Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</cwmp:Name>
+          <cwmp:Value>test provision</cwmp:Value>
+        </cwmp:ParameterValueStruct>
+        <cwmp:ParameterValueStruct>
+          <cwmp:Name>InternetGatewayDevice.DeviceInfo.X_000E50_Country</cwmp:Name>
+          <cwmp:Value>42</cwmp:Value>
+        </cwmp:ParameterValueStruct>
       </cwmp:ParameterList>
     </cwmp:SetParameterValues>
   </soap:Body>

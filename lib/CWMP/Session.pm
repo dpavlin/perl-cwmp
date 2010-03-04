@@ -198,18 +198,16 @@ sub process_request {
 		$xml = $self->dispatch( $dispatch );
 	} elsif ( $job = $queue->dequeue ) {
 		$xml = $self->dispatch( $job->dispatch );
-	} elsif ( $size == 0 ) {
-		warn ">>> over, closing connection $to_uid";
-		$sock->close;
-		return;
 	} else {
 		warn ">>> empty response $to_uid";
 		$state->{NoMoreRequests} = 1;
-		$xml = $self->dispatch( 'xml', sub {} );
+		$xml = '';
 	}
 
 	$sock->send( "Content-Length: " . length( $xml ) . "\r\n\r\n" );
-	$sock->send( $xml ) or die "can't send response";
+	if (length($xml)) {
+		$sock->send( $xml ) or die "can't send response";
+	}
 
 	warn ">>>> " . $ip . " [" . localtime() . "] sent ", length( $xml )," bytes $to_uid";
 

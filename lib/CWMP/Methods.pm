@@ -51,17 +51,16 @@ sub xml {
 	confess "no state?" unless ($state);
 	confess "no body closure" unless ( $closure );
 
-	confess "no ID in state ", dump( $state ) unless ( $state->{ID} );
-
 	#warn "state used to generate xml = ", dump( $state ) if $self->debug;
 
 	my $X = XML::Generator->new(':pretty');
 
+	my @header;
+	push( @header, $X->ID( $cwmp, { mustUnderstand => 1 }, $state->{ID} )) if $state->{ID};
+	push( @header, $X->NoMoreRequests( $cwmp, $state->{NoMoreRequests} || 0 ));
+
 	return $X->Envelope( $soap, { 'soap:encodingStyle' => "http://schemas.xmlsoap.org/soap/encoding/" },
-		$X->Header( $soap,
-			$X->ID( $cwmp, { mustUnderstand => 1 }, $state->{ID} ),
-			$X->NoMoreRequests( $cwmp, $state->{NoMoreRequests} || 0 ),
-		),
+		$X->Header( $soap, @header ),
 		$X->Body( $soap, $closure->( $X, $state ) ),
 	);
 }
@@ -112,14 +111,12 @@ sub SetParameterValues {
 
 		$X->SetParameterValues( $cwmp,
 			$X->ParameterList( $cwmp,
-				$X->ParameterNames( $cwmp,
-					map {
-						$X->ParameterValueStruct( $cwmp,
-							$X->Name( $cwmp, $_ ),
-							$X->Value( $cwmp, $params->{$_} )
-						)
-					} sort keys %$params
-				)
+				map {
+					$X->ParameterValueStruct( $cwmp,
+						$X->Name( $cwmp, $_ ),
+						$X->Value( $cwmp, $params->{$_} )
+					)
+				} sort keys %$params
 			)
 		);
 	});
