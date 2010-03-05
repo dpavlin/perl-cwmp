@@ -131,7 +131,7 @@ sub process_request {
 
 	if ( $size > 0 ) {
 
-		die "no SOAPAction header in ",dump($xml) unless defined ( $r->header('SOAPAction') );
+		warn "no SOAPAction header in ",dump($xml) unless defined ( $r->header('SOAPAction') );
 
 		warn "## request payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
 
