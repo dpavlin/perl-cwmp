@@ -139,6 +139,7 @@ sub state_to_uid {
 
 	my $uid = $state->{DeviceID}->{SerialNumber} ||
 		confess "no DeviceID.SerialNumber in ",dump( $state );
+	chomp($uid);
 
 	return $uid;
 }

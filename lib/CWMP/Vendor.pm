@@ -59,6 +59,7 @@ sub state2serial {
 	my $state = shift;
 
 	my $serial = $state->{DeviceID}->{SerialNumber} || die "no DeviceID.SerialNumber in ",dump($state);
+	chomp($serial);
 	my $ip =
 		$state->{Parameter}->{'.ExternalIPAddress'} ||
 		$state->{Parameter}->{

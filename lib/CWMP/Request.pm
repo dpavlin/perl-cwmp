@@ -31,6 +31,7 @@ our $rules =  [
 		'ID' => sub {
 			my ($tag_name, $tag_hash, $context, $parent_data) = @_;
 			$state->{ID} = $tag_hash->{_content};
+			chomp( $state->{ID} );
 		},
 
 		'DeviceId' => sub {
