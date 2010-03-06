@@ -15,11 +15,8 @@ state
 store
 / );
 
-use HTTP::Daemon;
 use Data::Dump qw/dump/;
 use Carp qw/carp confess cluck croak/;
-use File::Slurp;
-use File::Path qw/mkpath/;
 
 use CWMP::Request;
 use CWMP::Methods;
@@ -48,13 +45,9 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new( @_ );
 
-	confess "need sock" unless $self->sock;
 	confess "need store" unless $self->store;
-	my $peerhost = $self->sock->peerhost || confess "can't get sock->peerhost";
 
 	$self->debug( 0 ) unless $self->debug;
-
-	warn "created ", __PACKAGE__, "(", dump( @_ ), ") for $peerhost\n" if $self->debug;
 
 	my $store_obj = CWMP::Store->new({
 		debug => $self->debug,
@@ -83,65 +76,19 @@ of requests in single session.
 
 =cut
 
-my $dump_by_ip;
 
 sub process_request {
-	my $self = shift;
-
-	my $sock = $self->sock || die "no sock?";
-
-#	die "not IO::Socket::INET but ", ref( $sock ) unless ( ref($sock) eq 'Net::Server::Proto::TCP' );
-
-	if ( ! $sock->connected ) {
-		warn "SOCKET NOT CONNECTED\n";
-		return 0;
-	}
-
-	bless $sock, 'HTTP::Daemon::ClientConn';
-
-	# why do I have to do this?
-	# solution from http://use.perl.org/~Matts/journal/12896
-	${*$sock}{'httpd_daemon'} = HTTP::Daemon->new;
-
-	my $r = $sock->get_request;
-	
-	if ( ! $r ) {
-		warn "WARNING: can't get_request\n";
-		return 0;
-	}
-
-	my $ip = $sock->peerhost || confess "can't get peerhost from sock: $!";
-
-	my $xml = $r->content;
+	my ( $self, $ip, $xml ) = @_;
 
 	my $size = length( $xml );
-
-	warn "<<<< $ip [" . localtime() . "] ", $r->method, " ", $r->uri, " $size bytes\n";
-
-	my $dump_nr = $dump_by_ip->{$ip}++;
-	my $file = sprintf("./dump/%s/%04d.request", $ip, $dump_nr);
-
-	if ( $self->create_dump ) {
-		mkpath "dump/$ip" unless -e "dump/$ip";
-		write_file( $file, $r->as_string );
-		warn "### request dumped to file: $file\n" if $self->debug;
-	}
 
 	my $state;
 
 	if ( $size > 0 ) {
 
-		warn "no SOAPAction header in ",dump($xml) unless defined ( $r->header('SOAPAction') );
-
 		warn "## request payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
 
 		$state = CWMP::Request->parse( $xml );
-
-		if ( defined( $state->{_trigger} ) && $self->create_dump ) {
-			my $type = sprintf("dump/%s/%04d-%s", $ip, $dump_nr, $state->{_trigger});
-			$file =~ s!^.*?([^/]+)$!$1!;	#!vim
-			symlink $file, $type || warn "can't symlink $file -> $type: $!";
-		}
 
 		warn "## acquired state = ", dump( $state ), "\n" if $self->debug;
 
@@ -167,14 +114,14 @@ sub process_request {
 		#warn "last request state = ", dump( $state ), "\n" if $self->debug > 1;
 	}
 
-	$sock->send(join("\r\n",
+	my $out = join("\r\n",
 		'HTTP/1.1 200 OK',
 		'Content-Type: text/xml; charset="utf-8"',
-		'Server: PerlCWMP/42',
-		'SOAPServer: PerlCWMP/42'
-	)."\r\n");
+		'Server: Perl-CWMP/42',
+		'SOAPServer: Perl-CWMP/42'
+	) . "\r\n";
 
-	$sock->send( "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" ) if ( $state->{ID} );
+	$out .= "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" if $state->{ID};
 
 	my $uid = $self->store->state_to_uid( $state );
 
@@ -204,17 +151,13 @@ sub process_request {
 		$xml = '';
 	}
 
-	$sock->send( "Content-Length: " . length( $xml ) . "\r\n\r\n" );
-	if (length($xml)) {
-		$sock->send( $xml ) or die "can't send response";
-	}
-
-	warn ">>>> " . $ip . " [" . localtime() . "] sent ", length( $xml )," bytes $to_uid";
+	$out .= "Content-Length: " . length( $xml ) . "\r\n\r\n";
+	$out .= $xml if length($xml);
 
 	$job->finish if $job;
 	warn "### request over for $uid\n" if $self->debug;
 
-	return 1;	# next request
+	return $out;	# next request
 };
 
 =head2 dispatch
@@ -237,13 +180,6 @@ sub dispatch {
 		warn ">>> dispatching to $dispatch with args ",dump( $args ),"\n";
 		my $xml = $response->$dispatch( $self->state, $args );
 		warn "## response payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
-		if ( $self->create_dump ) {
-			my $ip = $self->sock->peerhost || confess "can't get sock->peerhost: $!";
-			my $dump_nr = $dump_by_ip->{$ip}++;
-			my $file = sprintf("dump/%s/%04d.response", $ip, $dump_nr );
-			write_file( $file, $xml );
-			warn "### response dump: $file\n" if $self->debug;
-		}
 		return $xml;
 	} else {
 		confess "can't dispatch to $dispatch";

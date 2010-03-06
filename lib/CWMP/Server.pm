@@ -10,6 +10,7 @@ port
 session
 background
 debug
+create_dump
 
 server
 / );
@@ -19,6 +20,10 @@ use CWMP::Queue;
 
 use Carp qw/confess/;
 use Data::Dump qw/dump/;
+
+use IO::Socket::INET;
+use File::Path qw/mkpath/;
+use File::Slurp;
 
 =head1 NAME
 
@@ -63,16 +68,6 @@ sub new {
 	$self->debug( 0 ) unless $self->debug;
 	warn "## debug level: ", $self->debug, "\n" if $self->debug;
 
-	$self->server(
-		CWMP::Server::Helper->new({
-			proto => 'tcp',
-			port => $self->port,
-			session => $self->session,
-			debug => $self->debug,
-			background => $self->background,
-		})
-	);
-
 	return $self;
 }
 
@@ -83,70 +78,95 @@ sub new {
 sub run {
 	my $self = shift;
 
-	$self->server->run;
-}
+	my $server = IO::Socket::INET->new(
+			Proto     => 'tcp',
+			LocalPort => $self->port,
+			Listen    => SOMAXCONN,
+			Reuse     => 1
+	) || die "can't start server on ", $self->port, ": $!";
 
-package CWMP::Server::Helper;
+	warn "listen on ", $server->sockhost, ":", $server->sockport, "\n";
 
-use warnings;
-use strict;
+	while (1) {
+		my $client = $server->accept() || next; # ALARM trickle us
 
-#use base qw/Net::Server/;
-use base qw/Net::Server::Fork/;
-use Carp qw/confess/;
-use Data::Dump qw/dump/;
+		my $session = CWMP::Session->new( $self->session ) || confess "can't create sessision";
 
-sub options {
-	my $self     = shift;
-	my $prop     = $self->{'server'};
-	my $template = shift;
+		while ( $self->sock_session( $client, $session ) ) {
+			warn "# another one\n";
+		}
 
-	### setup options in the parent classes
-	$self->SUPER::options($template);
-
-	# new single-value options
-	foreach my $p ( qw/ session debug / ) {
-		$prop->{ $p } ||= undef;
-		$template->{ $p } = \$prop->{ $p };
+		warn "# connection to ", $client->peerhost, " closed\n";
 	}
 
-	# new multi-value options
-#	foreach my $p ( qw/ default_queue / ) {
-#		$prop->{ $p } ||= [];
-#		$template->{ $p } = $prop->{ $p };
-#	}
 }
 
+my $dump_by_ip;
 
-=head2 process_request
+sub sock_session {
+	my ( $self, $sock, $session ) = @_;
 
-=cut
+	my $request = <$sock>;
+	return unless $request;
+	my $ip = $sock->peerhost;
 
-sub process_request {
-	my $self = shift;
+	my $headers;
 
-	my $prop = $self->{server};
-	confess "no server in ", ref( $self ) unless $prop;
-	my $sock = $prop->{client};
-	confess "no sock in ", ref( $self ) unless $sock;
+	while ( my $header = <$sock> ) {
+		$request .= $header;
+		chomp $header;
+		last if $header =~ m{^\s*$};
+		my ( $n, $v ) = split(/:\s*/, $header);
+		$v =~ s/[\r\n]+$//;
+		$headers->{ lc $n } = $v;
+	}
 
-	my $sess = $prop->{session} || confess "no session";
+	warn "<<<< $ip START\n$request\n";
 
-	eval  {
-		$sess->{sock} = $sock;
-		$sess->{debug} = $prop->{debug};
+	return $sock->connected unless $headers;
 
-		my $session = CWMP::Session->new( $sess ) || confess "can't create session from ",dump( $sess );
+warn dump( $headers );
 
-		while ( $session->process_request ) {
-			warn "...waiting for next request from CPE...\n" if $prop->{debug};
+	warn "missing $_ header\n" foreach grep { ! defined $headers->{ lc $_ } } ( 'SOAPAction' );
+
+	my $body;
+	if ( my $len = $headers->{'content-length'} ) {
+		read( $sock, $body, $len );
+	} elsif ( $headers->{'transfer-encoding'} =~ m/^chunked/i ) {
+		while ( my $len = <$sock> ) {
+warn "chunked ",dump($len);
+			$len =~ s/[\r\n]+$//;
+			$len = hex($len);
+			last if $len == 0;
+warn "reading $len bytes\n";
+			read( $sock, my $chunk, $len );
+warn "|$chunk| $len == ", length($chunk);
+			$body .= $chunk;
+			my $padding = <$sock>;
+warn "padding ",dump($padding);
 		}
-	};
+	} else {
+		warn "empty request\n";
+	}
 
-	warn "ERROR: $@\n" if $@;
+	warn "$body\n<<<< $ip END\n";
 
-	warn "...returning to accepting new connections\n" if $prop->{debug};
+	my $response = $session->process_request( $ip, $body );
+
+	my $dump_nr = $dump_by_ip->{$ip}++;
+
+	if ( $self->create_dump ) {
+		mkpath "dump/$ip" unless -e "dump/$ip";
+		write_file( sprintf("dump/%s/%04d.request", $ip, $dump_nr), "$request\r\n$body" );
+		write_file( sprintf("dump/%s/%04d.response", $ip, $dump_nr ), $response );
+	}
+
+	warn ">>>> $ip START\n$response\n>>>> $ip END\n";
+	print $sock $response;
+
+	return $sock->connected;
 
 }
+
 
 1;
