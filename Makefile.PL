@@ -5,8 +5,6 @@ use inc::Module::Install;
 name		'CWMP';
 version		'0.14';
 license		'GPL';
-requires	'Net::Server::Fork';
-requires	'HTTP::Daemon';
 requires	'XML::Rules';
 requires	'XML::Generator';
 requires	'Data::Dump';
