@@ -21,7 +21,7 @@ GetOptions(
 	'list!' => \$list,
 );
 
-die "usage: $0 CPE_id [--protocol-dump]\n" unless @ARGV;
+die "usage: $0 [...queue/]CPE_id [--list|--protocol-dump]\n" unless @ARGV;
 
 foreach my $id ( @ARGV ) {
 
@@ -114,13 +114,24 @@ foreach my $id ( @ARGV ) {
 
 		warn "injecting some tests commands\n";
 
-		$q->enqueue( 'GetRPCMethods' );
+#		$q->enqueue( 'GetRPCMethods' ); # XXX not supported by ZTE
 
-#		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.LANDevice.', 1 ] );
+		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
 
 		$q->enqueue( 'GetParameterValues', [
 		'InternetGatewayDevice.',
 		]);
+
+
+		# turn on periodic reporting to ACS server
+
+		$q->enqueue( 'GetParameterValues', [ 'InternetGatewayDevice.ManagementServer.' ] );
+		$q->enqueue( 'SetParameterValues', {
+			'InternetGatewayDevice.ManagementServer.PeriodicInformEnable' => 1,
+			'InternetGatewayDevice.ManagementServer.PeriodicInformInterval' => 15, # s
+		} );
+		$q->enqueue( 'GetParameterValues', [ 'InternetGatewayDevice.ManagementServer.' ] );
+
 
 #		$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
 
@@ -133,8 +144,25 @@ foreach my $id ( @ARGV ) {
 
 		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 0 ] );
 		$q->enqueue( 'GetParameterValues', [
-			'InternetGatewayDevice.',
+			#'InternetGatewayDevice.',	# too big for ZTE 
+			'InternetGatewayDevice.DeviceConfig.',
+			'InternetGatewayDevice.DeviceInfo.',
+			'InternetGatewayDevice.DeviceSummary',
+			'InternetGatewayDevice.ManagementServer.',
 		]);
+
+		$q->enqueue( 'GetParameterValues' => [ $_ ] ) foreach ( qw/
+InternetGatewayDevice.IPPingDiagnostics.
+InternetGatewayDevice.LANConfigSecurity.
+InternetGatewayDevice.LANDevice.
+InternetGatewayDevice.Layer2Bridging.
+InternetGatewayDevice.Layer3Forwarding.
+InternetGatewayDevice.ManagementServer.
+InternetGatewayDevice.QueueManagement.
+InternetGatewayDevice.Time.
+InternetGatewayDevice.UserInterface.
+InternetGatewayDevice.WANDevice.
+		/ );
 
 		$q->enqueue( 'GetParameterAttributes', [
 			'InternetGatewayDevice.DeviceInfo.SerialNumber',
