@@ -10,7 +10,7 @@ use Cwd qw/abs_path/;
 use File::Slurp;
 use blib;
 
-use Devel::LeakTrace::Fast;
+#use Devel::LeakTrace::Fast;
 
 BEGIN {
 	use_ok('CWMP::Methods');
