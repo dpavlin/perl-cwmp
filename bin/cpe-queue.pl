@@ -14,14 +14,16 @@ use File::Slurp;
 my $debug = 1;
 my $protocol_dump = 0;
 my $list = 0;
+my $introspect = 0;
 
 GetOptions(
 	'debug+' => \$debug,
 	'protocol-dump!' => \$protocol_dump,
 	'list!' => \$list,
+	'introspect!' => \$introspect,
 );
 
-die "usage: $0 [...queue/]CPE_id [--list|--protocol-dump]\n" unless @ARGV;
+die "usage: $0 [...queue/]CPE_id [ --list | --introspect | --protocol-dump ]\n" unless @ARGV;
 
 foreach my $id ( @ARGV ) {
 
@@ -110,27 +112,17 @@ foreach my $id ( @ARGV ) {
 		print "Active jobs [", scalar @active, "]\n",join("\n\n", @active) if @active;
 		print "Queued jobs [", scalar @queued, "]\n",join("\n\n", @queued) if @queued;
 
-	} else {
+	} elsif ( $introspect ) {
 
-		warn "injecting some tests commands\n";
-
-#		$q->enqueue( 'GetRPCMethods' ); # XXX not supported by ZTE
+		$q->enqueue( 'GetRPCMethods' ); # XXX not supported by ZTE
 
 		$q->enqueue( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
+
+#		$q->enqueue( 'GetRPCMethods' ); # XXX not supported by ZTE
 
 		$q->enqueue( 'GetParameterValues', [
 		'InternetGatewayDevice.',
 		]);
-
-
-		# turn on periodic reporting to ACS server
-
-		$q->enqueue( 'GetParameterValues', [ 'InternetGatewayDevice.ManagementServer.' ] );
-		$q->enqueue( 'SetParameterValues', {
-			'InternetGatewayDevice.ManagementServer.PeriodicInformEnable' => 1,
-			'InternetGatewayDevice.ManagementServer.PeriodicInformInterval' => 15, # s
-		} );
-		$q->enqueue( 'GetParameterValues', [ 'InternetGatewayDevice.ManagementServer.' ] );
 
 
 #		$q->enqueue( 'GetParameterNames', [ '.ExternalIPAddress', 1 ] );
@@ -170,6 +162,29 @@ InternetGatewayDevice.WANDevice.
 		]);
 
 #		$q->enqueue( 'SetParameterAttributes', [ '
+
+	} else {
+
+		warn "injecting some tests commands\n";
+
+		# turn on periodic reporting to ACS server
+
+#		$q->enqueue( 'GetParameterValues', [ 'InternetGatewayDevice.ManagementServer.' ] );
+		$q->enqueue( 'SetParameterValues', {
+			'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'perl-cwmp provision',
+		} );
+		$q->enqueue( 'SetParameterValues', {
+			'InternetGatewayDevice.ManagementServer.PeriodicInformInterval' => 15, # s
+		} );
+		$q->enqueue( 'SetParameterValues', {
+			'InternetGatewayDevice.ManagementServer.PeriodicInformEnable' => 1,
+		} );
+
+		$q->enqueue( 'GetParameterValues', [
+			'InternetGatewayDevice.ManagementServer.',
+			'InternetGatewayDevice.DeviceInfo.ProvisioningCode',
+		] );
+
 	}
 
 }
