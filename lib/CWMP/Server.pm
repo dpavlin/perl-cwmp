@@ -63,8 +63,6 @@ sub new {
 
 	warn "created ", __PACKAGE__, "(", dump( @_ ), ") object\n" if $self->debug;
 
-	warn "ACS waiting for request on port ", $self->port, "\n";
-
 	$self->debug( 0 ) unless $self->debug;
 	warn "## debug level: ", $self->debug, "\n" if $self->debug;
 
@@ -85,7 +83,7 @@ sub run {
 			Reuse     => 1
 	) || die "can't start server on ", $self->port, ": $!";
 
-	warn "listen on ", $server->sockhost, ":", $server->sockport, "\n";
+	warn "ACS waiting for request on port ", $self->port, "\n";
 
 	while (1) {
 		my $client = $server->accept() || next; # ALARM trickle us
