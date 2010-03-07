@@ -14,7 +14,8 @@ CWMP::Parser - parse SOAP request XML
 =head1 DESCRIPTION
 
 Design is based on my expirience with L<XML::Rules>, but show-stopper
-was it's inability to parse invalid XML returned by some devices.
+was it's inability to parse invalid XML returned by some devices, so
+in this version we depend on L<XML::Bare>
 
 =cut
 

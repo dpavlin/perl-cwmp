@@ -3,9 +3,9 @@ use lib './lib';
 use inc::Module::Install;
 
 name		'CWMP';
-version		'0.14';
+version		'0.20';
 license		'GPL';
-requires	'XML::Rules';
+requires	'XML::Bare';
 requires	'XML::Generator';
 requires	'Data::Dump';
 requires	'Carp';

@@ -21,3 +21,8 @@ Currently implemented:
 - 3.4.5 Digest Authentication
 + 3.4.6 Additional HTTP Requirements
 
+
+INSTALLATION
+
+Idea is to be as lightweight as possible, but some perl modules might be installed
+directly from CPAN
