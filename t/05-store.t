@@ -61,14 +61,14 @@ sub test_store {
 
 	is_deeply( $state, $store_state, 'state ID same as uid' );
 
-	ok( $store->update_state( {
+	$state = {
 		DeviceID => {
 			SerialNumber => 123456,
 		},
 		baz => 12345 
-	} ), 'update_state existing' );
+	};
 
-	$state->{baz} = 12345;
+	ok( $store->set_state( 123456, $state ), 'set_state' );
 
 	is_deeply( $store->get_state( 123456 ), $state, 'get_state' );
 

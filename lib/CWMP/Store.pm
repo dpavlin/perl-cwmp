@@ -109,6 +109,19 @@ sub get_state {
 
 }
 
+
+=head2 set_state
+
+  $store->set_state( $uid, $state );
+
+=cut
+
+sub set_state {
+	my $self = shift;
+	return $self->current_store->set_state( @_ );
+}
+
+
 =head2 all_uids
 
   my @cpe = $store->all_uids;

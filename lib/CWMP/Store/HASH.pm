@@ -101,6 +101,20 @@ sub get_state {
 	return;
 }
 
+
+=head2 set_state
+
+  $store->set_state( $uid, $state );
+
+=cut
+
+sub set_state {
+	my ( $self, $uid, $state ) = @_;
+	my $file = $self->file( $uid );
+	return $self->save_hash( $file, $state );
+}
+
+
 =head2 all_uids
 
   my @uids = $store->all_uids;

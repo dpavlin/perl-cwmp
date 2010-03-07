@@ -137,9 +137,25 @@ sub process_request {
 		$xml = $self->dispatch( $job->dispatch );
 		$job->finish;
 	} else {
-		warn ">>> empty response $to_uid";
-		$state->{NoMoreRequests} = 1;
-		$xml = '';
+		my $stored = $self->store->get_state( $uid );
+		if ( ! defined $stored->{ParameterInfo} ) {
+			$xml = $self->dispatch( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
+		} else {
+			my @params = grep { m/\.$/ } keys %{ $stored->{ParameterInfo} };
+			if ( @params ) {
+				warn "# GetParameterNames ", dump( @params );
+				$xml = $self->dispatch( 'GetParameterNames', [ shift @params, 1 ] );
+				foreach ( @params ) {
+					$queue->enqueue( 'GetParameterNames', [ $_, 1 ] );
+					delete( $stored->{ParameterInfo}->{ $_ } );
+				}
+				$self->store->set_state( $uid, $stored );
+			} else {
+				warn ">>> empty response $to_uid";
+				$state->{NoMoreRequests} = 1;
+				$xml = '';
+			}
+		}
 	}
 
 	my $status = length($xml) ? 200 : 204;
