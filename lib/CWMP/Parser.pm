@@ -19,6 +19,7 @@ was it's inability to parse invalid XML returned by some devices.
 =cut
 
 our $state;	# FIXME check this!
+my $debug = 0;
 
 sub _get_array {
 	my ( $tree ) = @_;
@@ -82,40 +83,46 @@ sub _walk {
 			$name =~ s/Struct//;
 			$name =~ s/Value//;
 
+			my @struct;
+
 			if ( ref $tree->{$node} eq 'HASH' ) {
-				push @{ $state->{$name} }, _hash_value $tree->{$node};
+				@struct = ( $tree->{$node} );
 			} elsif ( ref $tree->{$node} eq 'ARRAY' ) {
+				@struct = @{ $tree->{$node} };
+			} else {
+				die "don't know how to handle $node in ",dump($tree);
+			}
 
-				foreach my $e ( @{ $tree->{$node} } ) {
-					my $hash = _hash_value $e;
+			foreach my $e ( @struct ) {
+				my $hash = _hash_value $e;
 
-					if ( my $n = delete $hash->{Name} ) {
-						my @keys = keys %$hash;
-						if ( $#keys > 0 ) {
-							$state->{$name}->{$n} = $hash;
-						} else {
-							$state->{$name}->{$n} = $hash->{ $keys[0] };
-#							warn "using $keys[0] as value for $name.$n\n";
-						}
+				if ( my $n = delete $hash->{Name} ) {
+					my @keys = keys %$hash;
+					if ( $#keys > 0 ) {
+						$state->{$name}->{$n} = $hash;
 					} else {
-						push @{ $state->{$name} }, $hash;
+						$state->{$name}->{$n} = $hash->{ $keys[0] };
+#							warn "using $keys[0] as value for $name.$n\n";
 					}
+				} else {
+					push @{ $state->{$name} }, $hash;
 				}
 			}
+
 			$dump = 1;
 
 		} elsif ( ref($tree->{$node}) eq 'HASH' ) {
 
 			$state->{_dispatch} = 'InformResponse' if $node =~ m/Inform/;
 
-			warn "## recurse $node\n";
+			warn "## recurse $node\n" if $debug;
 			_walk( $tree->{$node} );
 
 		}
 	
 		if ( $dump ) {
 #			warn "XXX tree ",dump( $tree->{$node} );
-			warn "## state ",dump( $state );
+			warn "## state ",dump( $state ) if $debug;
 		}
 	}
 }
@@ -126,6 +133,7 @@ sub parse {
 	my $xml = shift || confess "no xml?";
 
 	$state = {};
+
 	my $bare = XML::Bare->new( text => $xml );
 	my $hash = $bare->parse();
 
