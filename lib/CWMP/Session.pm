@@ -70,14 +70,17 @@ my $vendor_data = {
  'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'test provision',
 };
 
+our $set_tried;
+
 sub vendor_hook {
-	my ( $self, $stored, $queue ) = @_;
-	warn "# vendor_hook ",dump($stored) if $self->debug > 2;
+	my ( $self, $uid, $stored, $queue ) = @_;
+	warn "# vendor_hook $uid ",dump($stored) if $self->debug > 2;
 
 	my @refresh;
 
 	foreach my $n ( keys %$vendor_data ) {
 		if ( $vendor_data->{$n} ne $stored->{$n} ) {
+			next if $set_tried->{$uid}->{$n}++;
 			push @refresh, $n;
 			$queue->enqueue( 'SetParameterValues', { $n => $vendor_data->{$n} } );
 		}
@@ -85,7 +88,7 @@ sub vendor_hook {
 
 	if ( @refresh ) {
 		$queue->enqueue( 'GetParameterValues', [ @refresh ] );
-		warn "vendor_hook SetParameterValues ", dump( @refresh );
+		warn "vendor_hook $uid SetParameterValues ", dump( @refresh );
 		return $self->dispatch( 'GetParameterValues', [ @refresh ] );
 	}
 
@@ -169,7 +172,10 @@ sub process_request {
 		if ( ! defined $stored->{ParameterInfo} ) {
 			$xml = $self->dispatch( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
 		} else {
-			my @params = grep { m/\.$/ } keys %{ $stored->{ParameterInfo} };
+			my @params =
+				grep { m/\.$/ && ! m/\.\d+\.$/ }
+				keys %{ $stored->{ParameterInfo} }
+			;
 			if ( @params ) {
 				warn "# GetParameterNames ", dump( @params );
 				my $first = shift @params;
@@ -196,7 +202,7 @@ sub process_request {
 						$queue->enqueue( 'GetParameterValues', [ @chunk ] );
 					}
 
-				} elsif ( $xml = $self->vendor_hook( $stored, $queue ) ) {
+				} elsif ( $xml = $self->vendor_hook( $uid, $stored, $queue ) ) {
 
 					warn "vendor_hook triggered\n";
 
