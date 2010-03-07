@@ -125,8 +125,6 @@ sub sock_session {
 
 	return $sock->connected unless $headers;
 
-warn dump( $headers );
-
 	warn "missing $_ header\n" foreach grep { ! defined $headers->{ lc $_ } } ( 'SOAPAction' );
 
 	my $body;
@@ -134,16 +132,12 @@ warn dump( $headers );
 		read( $sock, $body, $len );
 	} elsif ( $headers->{'transfer-encoding'} =~ m/^chunked/i ) {
 		while ( my $len = <$sock> ) {
-warn "chunked ",dump($len);
 			$len =~ s/[\r\n]+$//;
 			$len = hex($len);
 			last if $len == 0;
-warn "reading $len bytes\n";
 			read( $sock, my $chunk, $len );
-warn "|$chunk| $len == ", length($chunk);
 			$body .= $chunk;
 			my $padding = <$sock>;
-warn "padding ",dump($padding);
 		}
 	} else {
 		warn "empty request\n";
