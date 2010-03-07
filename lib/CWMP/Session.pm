@@ -144,10 +144,12 @@ sub process_request {
 			my @params = grep { m/\.$/ } keys %{ $stored->{ParameterInfo} };
 			if ( @params ) {
 				warn "# GetParameterNames ", dump( @params );
-				$xml = $self->dispatch( 'GetParameterNames', [ shift @params, 1 ] );
+				my $first = shift @params;
+				delete $stored->{ParameterInfo}->{$first};
+				$xml = $self->dispatch( 'GetParameterNames', [ $first, 1 ] );
 				foreach ( @params ) {
 					$queue->enqueue( 'GetParameterNames', [ $_, 1 ] );
-					delete( $stored->{ParameterInfo}->{ $_ } );
+					delete $stored->{ParameterInfo}->{ $_ };
 				}
 				$self->store->set_state( $uid, $stored );
 			} else {
