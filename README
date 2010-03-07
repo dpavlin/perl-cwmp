@@ -26,3 +26,27 @@ INSTALLATION
 
 Idea is to be as lightweight as possible, but some perl modules might be installed
 directly from CPAN
+
+  $ perl Makefile.PL
+  $ make
+
+will check for dependencies and install them if necesarry
+
+
+USING ACS SERVER
+
+  $ ./bin/acs.pl -d
+
+This will start server with debug output. You may repeat -d to increase debug level.
+
+Sever will listen on *:3333, so now you can configure your CPE to connect to it.
+
+When CPE first connects, ACS server will issue GetParameterNames untill it discovers
+whole hierarchy and which parameters are writable.
+
+After that, it will issue GetparameterValues requests, 16 in one batch to preserve
+resources on CPE, until it reads all values present on CPE.
+
+This will create file yaml/CPE_ID.yml with all parameters information from given CPE.
+
+
