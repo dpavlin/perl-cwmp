@@ -153,9 +153,24 @@ sub process_request {
 				}
 				$self->store->set_state( $uid, $stored );
 			} else {
-				warn ">>> empty response $to_uid";
-				$state->{NoMoreRequests} = 1;
-				$xml = '';
+
+				my @params = sort grep { ! exists $stored->{Parameter}->{$_} } grep { ! m/\.$/ } keys %{ $stored->{ParameterInfo} };
+				if ( @params ) {
+					warn "# GetParameterValues ", dump( @params );
+					my $first = shift @params;
+					$xml = $self->dispatch( 'GetParameterValues', [ $first ] );
+					while ( @params ) {
+						my @chunk = splice @params, 0, 16; # FIXME 16 seems to be max
+						$queue->enqueue( 'GetParameterValues', [ @chunk ] );
+					}
+
+				} else {
+
+					warn ">>> empty response $to_uid";
+					$state->{NoMoreRequests} = 1;
+					$xml = '';
+
+				}
 			}
 		}
 	}
