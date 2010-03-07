@@ -114,15 +114,6 @@ sub process_request {
 		#warn "last request state = ", dump( $state ), "\n" if $self->debug > 1;
 	}
 
-	my $out = join("\r\n",
-		'HTTP/1.1 200 OK',
-		'Content-Type: text/xml; charset="utf-8"',
-		'Server: Perl-CWMP/42',
-		'SOAPServer: Perl-CWMP/42'
-	) . "\r\n";
-
-	$out .= "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" if $state->{ID};
-
 	my $uid = $self->store->state_to_uid( $state );
 
 	my $to_uid = join(" ", grep { defined($_) } "to $uid",
@@ -138,23 +129,33 @@ sub process_request {
 		id => $uid,
 		debug => $self->debug,
 	});
-	my $job;
 	$xml = '';
 
 	if ( my $dispatch = $state->{_dispatch} ) {
 		$xml = $self->dispatch( $dispatch );
-	} elsif ( $job = $queue->dequeue ) {
+	} elsif ( my $job = $queue->dequeue ) {
 		$xml = $self->dispatch( $job->dispatch );
+		$job->finish;
 	} else {
 		warn ">>> empty response $to_uid";
 		$state->{NoMoreRequests} = 1;
 		$xml = '';
 	}
 
+	my $status = length($xml) ? 200 : 204;
+
+	my $out = join("\r\n",
+		"HTTP/1.1 $status OK",
+		'Content-Type: text/xml; charset="utf-8"',
+		'Server: Perl-CWMP/42',
+		'SOAPServer: Perl-CWMP/42'
+	) . "\r\n";
+
+	$out .= "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" if $state->{ID};
+
 	$out .= "Content-Length: " . length( $xml ) . "\r\n\r\n";
 	$out .= $xml if length($xml);
 
-	$job->finish if $job;
 	warn "### request over for $uid\n" if $self->debug;
 
 	return $out;	# next request
