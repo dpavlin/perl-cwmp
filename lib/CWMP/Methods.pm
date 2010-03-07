@@ -110,11 +110,11 @@ sub SetParameterValues {
 		my ( $X, $state ) = @_;
 
 		$X->SetParameterValues( $cwmp,
-			$X->ParameterList( $cwmp,
+			$X->ParameterList( [],
 				map {
-					$X->ParameterValueStruct( $cwmp,
-						$X->Name( $cwmp, $_ ),
-						$X->Value( $cwmp, $params->{$_} )
+					$X->ParameterValueStruct( [],
+						$X->Name( [], $_ ),
+						$X->Value( [], $params->{$_} )
 					)
 				} sort keys %$params
 			)
