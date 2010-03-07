@@ -3265,5 +3265,4 @@
         "InternetGatewayDevice.X_000E50_Firewall.LevelNumberOfEntries"                                                       => 0,
         "InternetGatewayDevice.X_000E50_Firewall.SelectedLevel"                                                              => 1,
       },
-  _trigger => "GetParameterNamesResponse",
 }

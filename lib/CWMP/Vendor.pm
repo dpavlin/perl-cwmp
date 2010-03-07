@@ -58,7 +58,7 @@ my ( $last_ip, $last_serial );
 sub state2serial {
 	my $state = shift;
 
-	my $serial = $state->{DeviceID}->{SerialNumber} || die "no DeviceID.SerialNumber in ",dump($state);
+	my $serial = $state->{DeviceId}->{SerialNumber} || die "no DeviceId.SerialNumber in ",dump($state);
 	chomp($serial);
 	my $ip =
 		$state->{Parameter}->{'.ExternalIPAddress'} ||
@@ -84,6 +84,11 @@ Install all custom triggers
 =cut
 
 sub add_triggers {
+}
+
+1;
+
+__END__
 
 	warn __PACKAGE__, "->add_triggers\n" if $debug;
 

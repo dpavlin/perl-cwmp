@@ -11,5 +11,4 @@
         "Reboot",
         "FactoryReset",
       ],
-  _trigger => "GetRPCMethodsResponse",
 }

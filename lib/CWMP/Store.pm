@@ -139,7 +139,7 @@ sub all_uids {
 
   my $CPE_uid = $store->ID_to_uid( $state );
 
-It uses C<< DeviceID.SerialNumber >> from C<Inform> message as unique ID
+It uses C<< DeviceId.SerialNumber >> from C<Inform> message as unique ID
 for each CPE.
 
 =cut
@@ -150,8 +150,8 @@ sub state_to_uid {
 
 	warn "#### state_to_uid",dump( $state ),$/ if $self->debug > 4;
 
-	my $uid = $state->{DeviceID}->{SerialNumber} ||
-		confess "no DeviceID.SerialNumber in ",dump( $state );
+	my $uid = $state->{DeviceId}->{SerialNumber} ||
+		confess "no DeviceId.SerialNumber in ",dump( $state );
 	chomp($uid);
 
 	return $uid;

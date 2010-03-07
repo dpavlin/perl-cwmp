@@ -40,7 +40,7 @@ our $rules =  [
 				next if $name eq '_content';
 				my $key = $name;
 				$key =~ s/^\w+://;	# stip namespace
-				$state->{DeviceID}->{ $key } = _tag( $tag_hash, $name, '_content' );
+				$state->{DeviceId}->{ $key } = _tag( $tag_hash, $name, '_content' );
 			}
 		},
 		'EventStruct' => sub {

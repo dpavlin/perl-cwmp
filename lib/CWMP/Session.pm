@@ -18,7 +18,7 @@ store
 use Data::Dump qw/dump/;
 use Carp qw/carp confess cluck croak/;
 
-use CWMP::Request;
+use CWMP::Parser;
 use CWMP::Methods;
 use CWMP::Store;
 
@@ -88,16 +88,16 @@ sub process_request {
 
 		warn "## request payload: ",length($xml)," bytes\n$xml\n" if $self->debug;
 
-		$state = CWMP::Request->parse( $xml );
+		$state = CWMP::Parser->parse( $xml );
 
 		warn "## acquired state = ", dump( $state ), "\n" if $self->debug;
 
-		if ( ! defined( $state->{DeviceID} ) ) {
+		if ( ! defined( $state->{DeviceId} ) ) {
 			if ( $self->state ) {
-				warn "## state without DeviceID, using old one...\n";
-				$state->{DeviceID} = $self->state->{DeviceID};
+				warn "## state without DeviceId, using old one...\n";
+				$state->{DeviceId} = $self->state->{DeviceId};
 			} else {
-				warn "WARNING: state without DeviceID, and I don't have old one!\n";
+				warn "WARNING: state without DeviceId, and I don't have old one!\n";
 				warn "## state = ",dump( $state );
 			}
 		}
