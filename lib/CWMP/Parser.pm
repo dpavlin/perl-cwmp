@@ -86,28 +86,27 @@ sub _walk {
 				push @{ $state->{$name} }, _hash_value $tree->{$node};
 			} elsif ( ref $tree->{$node} eq 'ARRAY' ) {
 
-				my $hash = _hash_value $tree->{$node}->[$_];
+				foreach my $e ( @{ $tree->{$node} } ) {
+					my $hash = _hash_value $e;
 
-				if ( my $n = delete $hash->{Name} ) {
-					my @keys = keys %$hash;
-					if ( $#keys > 0 ) {
-						$state->{$name}->{$n} = $hash;
+					if ( my $n = delete $hash->{Name} ) {
+						my @keys = keys %$hash;
+						if ( $#keys > 0 ) {
+							$state->{$name}->{$n} = $hash;
+						} else {
+							$state->{$name}->{$n} = $hash->{ $keys[0] };
+#							warn "using $keys[0] as value for $name.$n\n";
+						}
 					} else {
-						$state->{$name}->{$n} = $hash->{ $keys[0] };
-						warn "using $keys[0] as value for $name.$n\n";
+						push @{ $state->{$name} }, $hash;
 					}
-				} else {
-					push @{ $state->{$name} }, _hash_value $tree->{$node}->[$_]
-						foreach 0 .. $#{ $tree->{$node} };
 				}
 			}
 			$dump = 1;
 
-		} elsif ( $node =~ m/Inform/ ) {
-
-			$state->{_dispatch} = 'InformResponse';
-
 		} elsif ( ref($tree->{$node}) eq 'HASH' ) {
+
+			$state->{_dispatch} = 'InformResponse' if $node =~ m/Inform/;
 
 			warn "## recurse $node\n";
 			_walk( $tree->{$node} );
