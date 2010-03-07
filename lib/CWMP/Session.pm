@@ -154,7 +154,11 @@ sub process_request {
 				$self->store->set_state( $uid, $stored );
 			} else {
 
-				my @params = sort grep { ! exists $stored->{Parameter}->{$_} } grep { ! m/\.$/ } keys %{ $stored->{ParameterInfo} };
+				my @params = sort
+					grep { ! exists $stored->{Parameter}->{$_} }
+					grep { ! m/\.$/ && ! m/NumberOfEntries/ }
+					keys %{ $stored->{ParameterInfo} }
+				;
 				if ( @params ) {
 					warn "# GetParameterValues ", dump( @params );
 					my $first = shift @params;
