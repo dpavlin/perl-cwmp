@@ -64,6 +64,34 @@ sub new {
 	return $self;
 }
 
+my $vendor_data = {
+ 'InternetGatewayDevice.ManagementServer.PeriodicInformEnable' => 1,
+ 'InternetGatewayDevice.ManagementServer.PeriodicInformInterval' => 17,
+ 'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'test provision',
+};
+
+sub vendor_hook {
+	my ( $self, $stored, $queue ) = @_;
+	warn "# vendor_hook ",dump($stored) if $self->debug > 2;
+
+	my @refresh;
+
+	foreach my $n ( keys %$vendor_data ) {
+		if ( $vendor_data->{$n} ne $stored->{$n} ) {
+			push @refresh, $n;
+			$queue->enqueue( 'SetParameterValues', { $n => $vendor_data->{$n} } );
+		}
+	}
+
+	if ( @refresh ) {
+		$queue->enqueue( 'GetParameterValues', [ @refresh ] );
+		warn "vendor_hook SetParameterValues ", dump( @refresh );
+		return $self->dispatch( 'GetParameterValues', [ @refresh ] );
+	}
+
+	return;
+}
+
 =head2 process_request
 
 One request from client/response from server cycle. Call multiple times to
@@ -167,6 +195,10 @@ sub process_request {
 						my @chunk = splice @params, 0, 16; # FIXME 16 seems to be max
 						$queue->enqueue( 'GetParameterValues', [ @chunk ] );
 					}
+
+				} elsif ( $xml = $self->vendor_hook( $stored, $queue ) ) {
+
+					warn "vendor_hook triggered\n";
 
 				} else {
 
