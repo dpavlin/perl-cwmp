@@ -90,10 +90,13 @@ sub run {
 	while (1) {
 		my $client = $server->accept() || next; # ALARM trickle us
 
+		my $count = 0;
+
 		my $session = CWMP::Session->new( $self->session ) || confess "can't create sessision";
 
 		while ( $self->sock_session( $client, $session ) ) {
-			warn "# another one\n";
+			$count++;
+			warn "# finished request $count, waiting for next one\n";
 		}
 
 		warn "# connection to ", $client->peerhost, " closed\n";
