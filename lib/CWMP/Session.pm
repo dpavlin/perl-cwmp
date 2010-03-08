@@ -131,8 +131,11 @@ sub process_request {
 		$xml = $self->dispatch( $job->dispatch );
 		$job->finish;
 	} else {
-		my @dispatch = CWMP::Vendor->all_parameters( $self->store, $uid, $queue );
+		my @dispatch;
+#		@dispatch = CWMP::Vendor->all_parameters( $self->store, $uid, $queue );
+warn "XXX", dump @dispatch;
 		@dispatch = CWMP::Vendor->vendor_config( $self->store, $uid, $queue ) unless @dispatch;
+warn "XXX", dump @dispatch;
 		$xml = $self->dispatch( @dispatch ) if @dispatch;
 		if ( ! $xml ) {
 			warn ">>> no more work for $uid sending empty response\n";

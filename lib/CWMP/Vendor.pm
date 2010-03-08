@@ -14,7 +14,7 @@ CWMP::Vendor - implement vendor specific logic into ACS server
 
 =cut
 
-my $debug = 0;
+my $debug = 1;
 
 sub all_parameters {
 	my ( $self, $store, $uid, $queue ) = @_;
@@ -64,7 +64,7 @@ sub all_parameters {
 	return;
 }
 
-our $set_tried;
+our $tried;
 
 sub vendor_config {
 	my ( $self, $store, $uid, $queue ) = @_;
@@ -74,13 +74,21 @@ sub vendor_config {
 	my @refresh;
 
 	my $vendor = YAML::LoadFile 'vendor.yaml';
-	$vendor = $vendor->{Parameter} || die "no Parameter in vendor.yaml";
+	$vendor = $vendor->{Parameter} || die  "no Parameter in vendor.yaml";
+	$stored = $stored->{Parameter} || warn "no Parameter in stored ", dump($stored);
+
+	warn "# vendor.yaml ",dump $vendor;
 
 	foreach my $n ( keys %$vendor ) {
-		if ( defined $stored->{$n} && $vendor->{$n} ne $stored->{$n} ) {
-			next if $set_tried->{$uid}->{$n}++;
+		if ( ! exists $stored->{$n} ) {
+			warn "# $uid missing $n\n";
 			push @refresh, $n;
-			$queue->enqueue( 'SetParameterValues', { $n => $vendor->{$n} } );
+		} elsif ( $vendor->{$n} ne $stored->{$n} ) {
+			$queue->enqueue( 'SetParameterValues', { $n => $vendor->{$n} } )
+				unless $tried->{$uid}->{$n}->{set}++;
+			warn "# set $uid $n $stored->{$n} -> $vendor->{$n}\n";
+		} else {
+			warn "# ok $uid $n\n";
 		}
 	}
 
@@ -89,6 +97,8 @@ sub vendor_config {
 		warn "vendor_hook $uid SetParameterValues ", dump( @refresh );
 		return ( 'GetParameterValues', [ @refresh ] );
 	}
+
+	warn "# tried ",dump $tried;
 
 	return;
 }
