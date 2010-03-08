@@ -83,13 +83,17 @@ sub vendor_config {
 		if ( ! exists $stored->{$n} ) {
 			warn "# $uid missing $n\n";
 			push @refresh, $n;
-		} elsif ( $vendor->{$n} ne $stored->{$n} && ! $tried->{$uid}->{$n}->{set} && $tried->{$uid}->{$n}->{set} ne $vendor->{$n} ) {
+		} elsif ( $vendor->{$n} ne $stored->{$n}
+			&& ( ! $tried->{$uid}->{$n}->{set} || $tried->{$uid}->{$n}->{set} ne $vendor->{$n} )
+		) {
 			$queue->enqueue( 'SetParameterValues', { $n => $vendor->{$n} } );
 			push @refresh, $n;
 			$tried->{$uid}->{$n}->{set} = $vendor->{$n};
 			warn "# set $uid $n $stored->{$n} -> $vendor->{$n}\n";
+		} elsif ( $tried->{$uid}->{$n}->{set} eq $vendor->{$n} && $vendor->{$n} ne $stored->{$n} ) {
+			warn "ERROR $uid $n $stored->{$n} != $vendor->{$n}\n";
 		} else {
-			warn "# ok $uid $n\n";
+			warn "# ok $uid $n = $stored->{$n}\n";
 		}
 	}
 
