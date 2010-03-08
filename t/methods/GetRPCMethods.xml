@@ -6,6 +6,6 @@
     <cwmp:NoMoreRequests>0</cwmp:NoMoreRequests>
   </soap:Header>
   <soap:Body>
-    <GetRPCMethods />
+    <cwmp:GetRPCMethods></cwmp:GetRPCMethods>
   </soap:Body>
 </soap:Envelope>
