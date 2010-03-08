@@ -25,6 +25,8 @@ use IO::Socket::INET;
 use File::Path qw/mkpath/;
 use File::Slurp;
 
+use URI::Escape;
+
 =head1 NAME
 
 CWMP::Server - description
@@ -145,6 +147,20 @@ sub sock_session {
 	}
 
 	warn "$body\n<<<< $ip END\n";
+
+
+	# XXX evil security hole to eval code over web to inspect it
+	if ( $self->debug && $headers->{'user-agent'} =~ m{Mozilla} ) {
+		my $out = '';
+		if ( $request =~ m{^GET /(\$.+) HTTP/} ) {
+			my $eval = uri_unescape $1;
+			$out = dump( eval $eval );
+			$out .= "ERROR: $@\n" if $@;
+			warn "EVAL $eval = $out\n";
+		}
+		print $sock "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nConnection: close\r\n\r\n$out";
+		return 0;
+	}
 
 	my $response = $session->process_request( $ip, $body );
 
