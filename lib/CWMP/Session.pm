@@ -79,7 +79,7 @@ sub vendor_hook {
 	my @refresh;
 
 	foreach my $n ( keys %$vendor_data ) {
-		if ( $vendor_data->{$n} ne $stored->{$n} ) {
+		if ( defined $stored->{$n} && $vendor_data->{$n} ne $stored->{$n} ) {
 			next if $set_tried->{$uid}->{$n}++;
 			push @refresh, $n;
 			$queue->enqueue( 'SetParameterValues', { $n => $vendor_data->{$n} } );
