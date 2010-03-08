@@ -77,7 +77,7 @@ sub GetRPCMethods {
 	my ( $self, $state ) = @_;
 	$self->xml( $state, sub {
 		my ( $X, $state ) = @_;
-		$X->GetRPCMethods();
+		$X->GetRPCMethods( $cwmp, '' );
 	});
 };
 
