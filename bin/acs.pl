@@ -9,7 +9,6 @@ use strict;
 use lib './lib';
 use CWMP::Server;
 use CWMP::Session;
-use CWMP::Vendor;
 use Getopt::Long;
 use Data::Dump qw/dump/;
 use File::Find;
@@ -55,8 +54,6 @@ my $server = CWMP::Server->new({
 	},
 	debug => $debug,
 });
-
-CWMP::Vendor->add_triggers;
 
 $server->run();
 

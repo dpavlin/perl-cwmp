@@ -21,6 +21,7 @@ use Carp qw/carp confess cluck croak/;
 use CWMP::Parser;
 use CWMP::Methods;
 use CWMP::Store;
+use CWMP::Vendor;
 
 #use Devel::LeakTrace::Fast;
 
@@ -62,37 +63,6 @@ sub new {
 	$self->create_dump( 1 ) if $self->debug > 2;
 
 	return $self;
-}
-
-my $vendor_data = {
- 'InternetGatewayDevice.ManagementServer.PeriodicInformEnable' => 1,
- 'InternetGatewayDevice.ManagementServer.PeriodicInformInterval' => 17,
- 'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'test provision',
-};
-
-our $set_tried;
-
-sub vendor_hook {
-	my ( $self, $uid, $stored, $queue ) = @_;
-	warn "# vendor_hook $uid ",dump($stored) if $self->debug > 2;
-
-	my @refresh;
-
-	foreach my $n ( keys %$vendor_data ) {
-		if ( defined $stored->{$n} && $vendor_data->{$n} ne $stored->{$n} ) {
-			next if $set_tried->{$uid}->{$n}++;
-			push @refresh, $n;
-			$queue->enqueue( 'SetParameterValues', { $n => $vendor_data->{$n} } );
-		}
-	}
-
-	if ( @refresh ) {
-		$queue->enqueue( 'GetParameterValues', [ @refresh ] );
-		warn "vendor_hook $uid SetParameterValues ", dump( @refresh );
-		return $self->dispatch( 'GetParameterValues', [ @refresh ] );
-	}
-
-	return;
 }
 
 =head2 process_request
@@ -147,20 +117,13 @@ sub process_request {
 
 	my $uid = $self->store->state_to_uid( $state );
 
-	my $to_uid = join(" ", grep { defined($_) } "to $uid",
-			# board
-			$state->{Parameter}->{'InternetGatewayDevice.DeviceInfo.HardwareVersion'},
-			# version
-			$state->{Parameter}->{'InternetGatewayDevice.DeviceInfo.SoftwareVersion'},
-			# summary
-#			$state->{Parameter}->{'InternetGatewayDevice.DeviceSummary'},
-	) . "\n";
-
 	my $queue = CWMP::Queue->new({
 		id => $uid,
 		debug => $self->debug,
 	});
+
 	$xml = '';
+	my $status = 200;
 
 	if ( my $dispatch = $state->{_dispatch} ) {
 		$xml = $self->dispatch( $dispatch );
@@ -168,56 +131,16 @@ sub process_request {
 		$xml = $self->dispatch( $job->dispatch );
 		$job->finish;
 	} else {
-		my $stored = $self->store->get_state( $uid );
-		if ( ! defined $stored->{ParameterInfo} ) {
-			$xml = $self->dispatch( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
-		} else {
-			my @params =
-				grep { m/\.$/ }
-				keys %{ $stored->{ParameterInfo} }
-			;
-			if ( @params ) {
-				warn "# GetParameterNames ", dump( @params );
-				my $first = shift @params;
-				delete $stored->{ParameterInfo}->{$first};
-				$xml = $self->dispatch( 'GetParameterNames', [ $first, 1 ] );
-				foreach ( @params ) {
-					$queue->enqueue( 'GetParameterNames', [ $_, 1 ] );
-					delete $stored->{ParameterInfo}->{ $_ };
-				}
-				$self->store->set_state( $uid, $stored );
-			} else {
-
-				my @params = sort
-					grep { ! exists $stored->{Parameter}->{$_} }
-					grep { ! m/\.$/ && ! m/NumberOfEntries/ }
-					keys %{ $stored->{ParameterInfo} }
-				;
-				if ( @params ) {
-					warn "# GetParameterValues ", dump( @params );
-					my $first = shift @params;
-					$xml = $self->dispatch( 'GetParameterValues', [ $first ] );
-					while ( @params ) {
-						my @chunk = splice @params, 0, 16; # FIXME 16 seems to be max
-						$queue->enqueue( 'GetParameterValues', [ @chunk ] );
-					}
-
-				} elsif ( $xml = $self->vendor_hook( $uid, $stored, $queue ) ) {
-
-					warn "vendor_hook triggered\n";
-
-				} else {
-
-					warn ">>> empty response $to_uid";
-					$state->{NoMoreRequests} = 1;
-					$xml = '';
-
-				}
-			}
+		my @dispatch = CWMP::Vendor->all_parameters( $self->store, $uid, $queue );
+		@dispatch = CWMP::Vendor->vendor_config( $self->store, $uid, $queue ) unless @dispatch;
+		$xml = $self->dispatch( @dispatch ) if @dispatch;
+		if ( ! $xml ) {
+			warn ">>> no more work for $uid sending empty response\n";
+			$state->{NoMoreRequests} = 1;
+			$xml = '';
+			$status = 204;
 		}
 	}
-
-	my $status = length($xml) ? 200 : 204;
 
 	my $out = join("\r\n",
 		"HTTP/1.1 $status OK",
@@ -230,8 +153,6 @@ sub process_request {
 
 	$out .= "Content-Length: " . length( $xml ) . "\r\n\r\n";
 	$out .= $xml if length($xml);
-
-	warn "### request over for $uid\n" if $self->debug;
 
 	return $out;	# next request
 };
