@@ -173,7 +173,7 @@ sub process_request {
 			$xml = $self->dispatch( 'GetParameterNames', [ 'InternetGatewayDevice.', 1 ] );
 		} else {
 			my @params =
-				grep { m/\.$/ && ! m/\.\d+\.$/ }
+				grep { m/\.$/ }
 				keys %{ $stored->{ParameterInfo} }
 			;
 			if ( @params ) {
