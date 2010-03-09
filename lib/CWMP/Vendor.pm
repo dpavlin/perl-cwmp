@@ -87,6 +87,7 @@ sub vendor_config {
 			&& ( ! $tried->{$uid}->{$n}->{set} || $tried->{$uid}->{$n}->{set} ne $vendor->{$n} )
 		) {
 			$queue->enqueue( 'SetParameterValues', { $n => $vendor->{$n} } );
+			$queue->enqueue( 'GetParameterValues', [ $n ] );	# refresh after change
 			push @refresh, $n;
 			$tried->{$uid}->{$n}->{set} = $vendor->{$n};
 			warn "# set $uid $n $stored->{$n} -> $vendor->{$n}\n";
