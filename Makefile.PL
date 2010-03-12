@@ -34,10 +34,14 @@ features(
 		-default => 0,
 		'JSON::XS' => 2.0,
 	],
-	'Command-line access to modems (tcli.pl)' => [
+	'Command-line access to Thompson modems (tcli.pl)' => [
 		-default => 0,
 		'Expect',
 		'Net::Telnet',
+	],
+	'Trigger TR-069 implementation over Web on ZTE' => [
+		-default => 0,
+		'WWW::Mechanize',
 	],
 	'HTML documentation (make html)' => [
 		-default => 0,
