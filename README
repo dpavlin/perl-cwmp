@@ -27,6 +27,8 @@ INSTALLATION
 Idea is to be as lightweight as possible, but some perl modules might be installed
 directly from CPAN
 
+  $ git clone git://github.com/dpavlin/perl-cwmp.git
+
   $ perl Makefile.PL
   $ make
 
