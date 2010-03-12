@@ -155,8 +155,6 @@ sub state_to_uid {
 	my $uid = $state->{DeviceId}->{SerialNumber};
 	chomp($uid);
 
-	warn "XX uid: $uid\n";
-
 	return $uid;
 }
 
