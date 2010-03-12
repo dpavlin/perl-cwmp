@@ -11,7 +11,7 @@ use blib;
 
 BEGIN {
 	use_ok('CWMP::Server');
-	use_ok('CWMP::Request');
+	use_ok('CWMP::Parser');
 	use_ok('CWMP::Methods');
 	use_ok('CWMP::Store');
 }
