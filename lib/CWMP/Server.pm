@@ -163,8 +163,10 @@ sub sock_session {
 		} elsif ( $request =~ m{^GET /yaml HTTP/} ) {
 			$type = 'text/html';
 			$out .= qq{<ul>};
-			$out .= qq{<li><a href="/$_">} foreach glob 'yaml/*.yml';
+			$out .= qq{<li><a href="/$_">$_</a>} foreach ( glob 'yaml/*.yml' );
 			$out .= qq{</ul>};
+		} elsif ( $request =~ m{^GET /(yaml/.+) HTTP} ) {
+			$out .= read_file uri_unescape $1;
 		}
 
 		print $sock "HTTP/1.1 200 OK\r\nContent-type: $type\r\nConnection: close\r\n\r\n$out";
