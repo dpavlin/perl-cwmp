@@ -33,7 +33,8 @@ sub file {
 
 sub save_hash {
 	my ( $self, $file, $hash ) = @_;
-	DumpFile( $file, $hash );
+	DumpFile( $file . '.tmp', $hash );
+	rename $file . '.tmp', $file || die "can't rename $file.tmp -> $file: $!";
 }
 
 sub load_hash {
