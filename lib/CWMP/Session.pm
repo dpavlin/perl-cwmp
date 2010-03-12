@@ -115,7 +115,7 @@ sub process_request {
 		#warn "last request state = ", dump( $state ), "\n" if $self->debug > 1;
 	}
 
-	my $uid = $self->store->state_to_uid( $state );
+	my $uid = $self->store->state_to_uid( $state ) || return;
 
 	my $queue = CWMP::Queue->new({
 		id => $uid,
@@ -145,19 +145,14 @@ warn "XXX", dump @dispatch;
 		}
 	}
 
-	my $out = join("\r\n",
-		"HTTP/1.1 $status OK",
-		'Content-Type: text/xml; charset="utf-8"',
-		'Server: Perl-CWMP/42',
-		'SOAPServer: Perl-CWMP/42'
-	) . "\r\n";
+	my $headers = [
+		"Content-Type: text/xml; charset=\"utf-8\"", 
+		"Content-Length: " . length( $xml ),
+	];
 
-	$out .= "Set-Cookie: ID=" . $state->{ID} . "; path=/\r\n" if $state->{ID};
+	push @$headers, "Set-Cookie: ID=" . $state->{ID} . "; path=/" if $state->{ID};
 
-	$out .= "Content-Length: " . length( $xml ) . "\r\n\r\n";
-	$out .= $xml if length($xml);
-
-	return $out;	# next request
+	return ( $status, $headers, $xml );
 };
 
 =head2 dispatch

@@ -4,6 +4,8 @@ package CWMP::Server;
 use strict;
 use warnings;
 
+our $VERSION = '0,20';
+
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors( qw/
 port
@@ -152,27 +154,49 @@ sub sock_session {
 	# XXX evil security hole to eval code over web to inspect it
 	if ( $self->debug && $headers->{'user-agent'} =~ m{Mozilla} ) {
 		my $out = '';
+		my $type = 'text/plain';
 		if ( $request =~ m{^GET /(\$.+) HTTP/} ) {
 			my $eval = uri_unescape $1;
 			$out = dump( eval $eval );
 			$out .= "ERROR: $@\n" if $@;
 			warn "EVAL $eval = $out\n";
+		} elsif ( $request =~ m{^GET /yaml HTTP/} ) {
+			$type = 'text/html';
+			$out .= qq{<ul>};
+			$out .= qq{<li><a href="/$_">} foreach glob 'yaml/*.yml';
+			$out .= qq{</ul>};
 		}
-		print $sock "HTTP/1.1 200 OK\r\nContent-type: text/plain\r\nConnection: close\r\n\r\n$out";
+
+		print $sock "HTTP/1.1 200 OK\r\nContent-type: $type\r\nConnection: close\r\n\r\n$out";
 		return 0;
 	}
 
-	my $response = $session->process_request( $ip, $body );
+	my ( $status, $headers, $response ) = $session->process_request( $ip, $body );
+
+	if ( ! $status ) {
+		warn ">>>> $ip 500\n";
+		print $sock "500 Not implemented\r\nConnection: close\r\n\r\n";
+		close $sock;
+		return;
+	}
+
+	my $out = join("\r\n",
+		"HTTP/1.1 $status OK",
+		@$headers,
+		"Server: Perl-CWMP/$VERSION",
+		"SOAPServer: Perl-CWMP/$VERSION"
+	);
 
 	my $dump_nr = $dump_by_ip->{$ip}++;
 
 	if ( $self->create_dump ) {
 		mkpath "dump/$ip" unless -e "dump/$ip";
 		write_file( sprintf("dump/%s/%04d.request", $ip, $dump_nr), "$request\r\n$body" );
-		write_file( sprintf("dump/%s/%04d.response", $ip, $dump_nr ), $response );
+		write_file( sprintf("dump/%s/%04d.response", $ip, $dump_nr ), "$out\r\n\r\n$response" );
 	}
 
-	warn ">>>> $ip START\n$response\n>>>> $ip END\n";
+	warn ">>>> $ip START\n$out\n\n$response\n>>>> $ip END\n";
+	print $sock $out, "\r\n\r\n";
 	print $sock $response;
 
 	return $sock->connected;

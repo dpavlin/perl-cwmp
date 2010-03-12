@@ -150,9 +150,12 @@ sub state_to_uid {
 
 	warn "#### state_to_uid",dump( $state ),$/ if $self->debug > 4;
 
-	my $uid = $state->{DeviceId}->{SerialNumber} ||
-		confess "no DeviceId.SerialNumber in ",dump( $state );
+	return unless defined $state->{DeviceId}->{SerialNumber};
+
+	my $uid = $state->{DeviceId}->{SerialNumber};
 	chomp($uid);
+
+	warn "XX uid: $uid\n";
 
 	return $uid;
 }

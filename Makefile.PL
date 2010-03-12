@@ -3,7 +3,7 @@ use lib './lib';
 use inc::Module::Install;
 
 name		'CWMP';
-version		'0.20';
+version_from 'lib/CWMP/Server.pm';
 license		'GPL';
 requires	'XML::Bare';
 requires	'XML::Generator';
