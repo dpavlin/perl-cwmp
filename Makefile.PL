@@ -20,7 +20,7 @@ requires	'Hash::Merge';
 requires	'IPC::DirQueue';
 requires	'File::Spec';
 requires	'File::Path';
-requires	'Class::Trigger';
+#requires	'Class::Trigger';
 requires	'File::Find';
 
 build_requires 'Test::More';
@@ -31,11 +31,11 @@ features(
 		'YAML::Syck' => 0.91,
 	],
 	'CWMP::Store::JSON' => [
-		-default => 1,
+		-default => 0,
 		'JSON::XS' => 2.0,
 	],
 	'Command-line access to modems (tcli.pl)' => [
-		-default => 1,
+		-default => 0,
 		'Expect',
 		'Net::Telnet',
 	],
