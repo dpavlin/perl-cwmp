@@ -20,26 +20,32 @@ my $debug = 0;
 my $store_path = './';
 my $store_plugin = 'YAML';
 my $create_dump = 1;
+my $dump_dir = 'dump/';
 
 GetOptions(
 	'debug+' => \$debug,
 	'port=i' => \$port,
 	'store-path=s' => \$store_path,
 	'store-plugin=s' => \$store_plugin,
-	'create_dump!' => \$create_dump,
+	'create-dump!' => \$create_dump,
+	'dump-dir=s' => \$dump_dir,
 );
 
 if ( $create_dump ) {
 	warn "## cleaning dump directory\n" if $debug;
-	find({
-		wanted => sub {
-			my $path = $File::Find::name;
-			return if -d $path;
-			unlink($path) || die "can't remove $path: $!";
-			warn "## removed $path\n" if $debug;
-		},
-		no_chdir => 1,
-	}, 'dump/' );
+	if ( -e $dump_dir ) {
+		find({
+			wanted => sub {
+				my $path = $File::Find::name;
+				return if -d $path;
+				unlink($path) || die "can't remove $path: $!";
+				warn "## removed $path\n" if $debug;
+			},
+			no_chdir => 1,
+		}, $dump_dir );
+	} else {
+		mkdir $dump_dir;
+	}
 }
 
 my $server = CWMP::Server->new({
