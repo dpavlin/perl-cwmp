@@ -40,9 +40,9 @@ will check for dependencies and install them if necesarry
 
 USING ACS SERVER
 
-  $ ./bin/acs.pl -d
+  $ ./bin/acs.pl --debug
 
-This will start server with debug output. You may repeat -d to increase debug level.
+This will start server with debug output. You may repeat --debug to increase debug level.
 
 Sever will listen on *:3333, so now you can configure your CPE to connect to it.
 
