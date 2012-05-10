@@ -1,0 +1,67 @@
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:cwmp="urn:dslforum-org:cwmp-1-0">
+    <SOAP-ENV:Header>
+      <cwmp:ID SOAP-ENV:mustUnderstand="1">946498461</cwmp:ID>
+    </SOAP-ENV:Header>
+    <SOAP-ENV:Body>
+      <cwmp:Inform>
+        <DeviceId>
+          <Manufacturer>Zhone</Manufacturer>
+          <OUI>00255e</OUI>
+          <ProductClass>6718</ProductClass>
+          <SerialNumber>00255e71f7ac</SerialNumber>
+        </DeviceId>
+        <Event SOAP-ENC:arrayType="cwmp:EventStruct[2]">
+          <EventStruct>
+            <EventCode>0 BOOTSTRAP</EventCode>
+            <CommandKey></CommandKey>
+          </EventStruct>
+          <EventStruct>
+            <EventCode>1 BOOT</EventCode>
+            <CommandKey></CommandKey>
+          </EventStruct>
+        </Event>
+        <MaxEnvelopes>1</MaxEnvelopes>
+        <CurrentTime>1970-01-01T00:05:09+00:00</CurrentTime>
+        <RetryCount>5</RetryCount>
+        <ParameterList SOAP-ENC:arrayType="cwmp:ParameterValueStruct[0008]">
+            <ParameterValueStruct>
+              <Name>InternetGatewayDevice.DeviceSummary</Name>
+              <Value xsi:type="xsd:string">InternetGatewayDevice:1.1[](Baseline:1, EthernetLAN:1, USBLAN:1, WiFiLAN:1, ADSLWAN:1, Time:1, IPPing:1, ATMLoopback:1, DSLDiagnostics:1, DeviceAssociation:1)</Value>
+            </ParameterValueStruct>
+            <ParameterValueStruct>
+              <Name>InternetGatewayDevice.DeviceInfo.SpecVersion</Name>
+              <Value xsi:type="xsd:string">1.0</Value>
+            </ParameterValueStruct>
+            <ParameterValueStruct>
+              <Name>InternetGatewayDevice.DeviceInfo.HardwareVersion</Name>
+              <Value xsi:type="xsd:string">REV.1.01</Value>
+            </ParameterValueStruct>
+            <ParameterValueStruct>
+              <Name>InternetGatewayDevice.DeviceInfo.SoftwareVersion</Name>
+              <Value xsi:type="xsd:string">01.01.02</Value>
+            </ParameterValueStruct>
+            <ParameterValueStruct>
+              <Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</Name>
+              <Value xsi:type="xsd:string"></Value>
+            </ParameterValueStruct>
+            <ParameterValueStruct>
+              <Name>InternetGatewayDevice.ManagementServer.ConnectionRequestURL</Name>
+              <Value xsi:type="xsd:string">http://216.113.193.87:30005/</Value>
+            </ParameterValueStruct>
+            <ParameterValueStruct>
+              <Name>InternetGatewayDevice.ManagementServer.ParameterKey</Name>
+              <Value xsi:type="xsd:string"></Value>
+            </ParameterValueStruct>
+            <ParameterValueStruct>
+              <Name>InternetGatewayDevice.WANDevice.3.WANConnectionDevice.1.WANIPConnection.2.ExternalIPAddress</Name>
+              <Value xsi:type="xsd:string">216.113.193.87</Value>
+            </ParameterValueStruct>
+        </ParameterList>
+      </cwmp:Inform>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
