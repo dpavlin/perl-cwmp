@@ -1,7 +1,7 @@
 perl-cwmp - Perl ACS server implementing CWMP protocol to manage CPE clients
 
 Idea here is to implement simpliest possible TR-069 server which can talk to vendor's
-CPE and support various quriks (mostly protocol violations) found in implementations.
+CPE and support various quirks (mostly protocol violations) found in implementations.
 
 
 This implementation follows specification:
@@ -40,9 +40,9 @@ will check for dependencies and install them if necesarry
 
 USING ACS SERVER
 
-  $ ./bin/acs.pl -d
+  $ ./bin/acs.pl --debug
 
-This will start server with debug output. You may repeat -d to increase debug level.
+This will start server with debug output. You may repeat --debug to increase debug level.
 
 Sever will listen on *:3333, so now you can configure your CPE to connect to it.
 

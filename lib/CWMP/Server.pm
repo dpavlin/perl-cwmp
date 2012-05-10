@@ -173,7 +173,8 @@ sub sock_session {
 		return 0;
 	}
 
-	my ( $status, $headers, $response ) = $session->process_request( $ip, $body );
+	my ( $status, $response);
+	( $status, $headers, $response ) = $session->process_request( $ip, $body );
 
 	if ( ! $status ) {
 		warn ">>>> $ip 500\n";
