@@ -1,5 +1,5 @@
 --- 
 Parameter: 
   InternetGatewayDevice.ManagementServer.PeriodicInformEnable: 1
-  InternetGatewayDevice.ManagementServer.PeriodicInformInterval: 15
+  InternetGatewayDevice.ManagementServer.PeriodicInformInterval: 60
 #  InternetGatewayDevice.ManagementServer.URL: http://192.168.2.100:3333
