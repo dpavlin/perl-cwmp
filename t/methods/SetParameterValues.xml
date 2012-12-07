@@ -17,6 +17,7 @@
           <Value>42</Value>
         </ParameterValueStruct>
       </ParameterList>
+      <ParameterKey></ParameterKey>
     </cwmp:SetParameterValues>
   </soap:Body>
 </soap:Envelope>
