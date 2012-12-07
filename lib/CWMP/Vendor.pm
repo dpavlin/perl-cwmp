@@ -25,7 +25,8 @@ sub all_parameters {
 		if ! defined $stored->{ParameterInfo};
 
 	my @params =
-		grep { m/\.$/ }
+		map { $stored->{_GetParameterNames}->{$_}++; $_ }
+		grep { m/\.$/ && ! exists $stored->{_GetParameterNames}->{$_} }
 		keys %{ $stored->{ParameterInfo} }
 	;
 
@@ -45,10 +46,14 @@ sub all_parameters {
 	} else {
 
 		my @params = sort
-			grep { ! exists $stored->{Parameter}->{$_} }
+			map { $stored->{_GetParameterValues}->{$_}++; $_ }
+			grep { ! exists $stored->{Parameter}->{$_} && ! exists $stored->{_GetParameterValues}->{$_} }
 			grep { ! m/\.$/ && ! m/NumberOfEntries/ }
 			keys %{ $stored->{ParameterInfo} }
 		;
+
+		$store->set_state( $uid, $stored );
+
 		if ( @params ) {
 			warn "# GetParameterValues ", dump( @params );
 			my $first = shift @params;
