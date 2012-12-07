@@ -46,15 +46,15 @@ foreach my $id ( @ARGV ) {
 
 		$q->enqueue( 'GetParameterValues', [
 			'InternetGatewayDevice.DeviceInfo.SerialNumber',
-			'InternetGatewayDevice.DeviceInfo.VendorConfigFile.',
-			'InternetGatewayDevice.DeviceInfo.X_000E50_Country',
+#			'InternetGatewayDevice.DeviceInfo.VendorConfigFile.',
+#			'InternetGatewayDevice.DeviceInfo.X_000E50_Country',
 		] );
 		$q->enqueue( 'SetParameterValues', {
 			'InternetGatewayDevice.DeviceInfo.ProvisioningCode' => 'test provision',
-	#		'InternetGatewayDevice.DeviceInfo.X_000E50_Country' => 1,
+#			'InternetGatewayDevice.DeviceInfo.X_000E50_Country' => 1,
 		});
 
-		$q->enqueue( 'Reboot' );
+#		$q->enqueue( 'Reboot' );
 
 	}
 
