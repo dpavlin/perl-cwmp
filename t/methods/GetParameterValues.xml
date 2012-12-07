@@ -1,6 +1,5 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
                xmlns:cwmp="urn:dslforum-org:cwmp-1-0"
-               xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
                soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
   <soap:Header>
     <cwmp:ID mustUnderstand="1">42</cwmp:ID>
@@ -8,10 +7,10 @@
   </soap:Header>
   <soap:Body>
     <cwmp:GetParameterValues>
-      <cwmp:ParameterNames>
-        <xsd:string>InternetGatewayDevice.DeviceInfo.SerialNumber</xsd:string>
-        <xsd:string>InternetGatewayDevice.DeviceInfo.VendorConfigFile.</xsd:string>
-      </cwmp:ParameterNames>
+      <ParameterNames soap:arrayType="xsd:string[2]">
+        <string>InternetGatewayDevice.DeviceInfo.SerialNumber</string>
+        <string>InternetGatewayDevice.DeviceInfo.VendorConfigFile.</string>
+      </ParameterNames>
     </cwmp:GetParameterValues>
   </soap:Body>
 </soap:Envelope>

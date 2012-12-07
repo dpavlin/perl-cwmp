@@ -146,9 +146,9 @@ sub GetParameterValues {
 		my ( $X, $state ) = @_;
 
 		$X->GetParameterValues( $cwmp,
-			$X->ParameterNames( $cwmp,
+			$X->ParameterNames( { 'soap:arrayType' => 'xsd:string[' . ( $#ParameterNames + 1 ) . ']' },
 				map {
-					$X->string( $xsd, $_ )
+					$X->string( $_ )
 				} @ParameterNames
 			)
 		);
