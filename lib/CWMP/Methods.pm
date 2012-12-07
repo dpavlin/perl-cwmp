@@ -110,7 +110,7 @@ sub SetParameterValues {
 		my ( $X, $state ) = @_;
 
 		$X->SetParameterValues( $cwmp,
-			$X->ParameterList( [],
+			$X->ParameterList( [], { 'soap:arrayType' => 'cwmp:ParameterValueStruct['.(scalar keys %$params).']' },
 				map {
 					$X->ParameterValueStruct( [],
 						$X->Name( [], $_ ),

@@ -7,7 +7,7 @@
   </soap:Header>
   <soap:Body>
     <cwmp:SetParameterValues>
-      <ParameterList>
+      <ParameterList soap:arrayType="cwmp:ParameterValueStruct[2]">
         <ParameterValueStruct>
           <Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</Name>
           <Value>test provision</Value>
