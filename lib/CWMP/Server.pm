@@ -148,6 +148,12 @@ sub sock_session {
 		warn "empty request\n";
 	}
 
+	if ( length($body) == 0 || lc($headers->{connection}) eq 'close' ) {
+		warn "<<<< $ip EMPTY END\n";
+		print $sock "HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n";
+		return;
+	}
+
 	warn "$body\n<<<< $ip END\n";
 
 
