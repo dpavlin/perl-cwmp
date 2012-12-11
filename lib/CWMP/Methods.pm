@@ -40,7 +40,7 @@ For examples, see source of this module.
 =cut
 
 my $cwmp = [ cwmp => 'urn:dslforum-org:cwmp-1-0' ];
-my $soap = [ soap => 'http://schemas.xmlsoap.org/soap/envelope/' ];
+my $soap = [ soap => 'http://schemas.xmlsoap.org/soap/envelope/', 'encodingStyle' => "http://schemas.xmlsoap.org/soap/encoding/" ];
 my $xsd  = [ xsd  => 'http://www.w3.org/2001/XMLSchema-instance' ];
 
 sub xml {
@@ -56,10 +56,10 @@ sub xml {
 	my $X = XML::Generator->new(':pretty');
 
 	my @header;
-	push( @header, $X->ID( $cwmp, { mustUnderstand => 1 }, $state->{ID} )) if $state->{ID};
+	push( @header, $X->ID( $cwmp, { 'soap:mustUnderstand' => 1 }, $state->{ID} )) if $state->{ID};
 	push( @header, $X->NoMoreRequests( $cwmp, $state->{NoMoreRequests} || 0 ));
 
-	return $X->Envelope( $soap, { 'soap:encodingStyle' => "http://schemas.xmlsoap.org/soap/encoding/" },
+	return $X->Envelope( $soap,
 		$X->Header( $soap, @header ),
 		$X->Body( $soap, $closure->( $X, $state ) ),
 	);
@@ -110,7 +110,7 @@ sub SetParameterValues {
 		my ( $X, $state ) = @_;
 
 		$X->SetParameterValues( $cwmp,
-			$X->ParameterList( [], { 'soap:arrayType' => 'cwmp:ParameterValueStruct['.(scalar keys %$params).']' },
+			$X->ParameterList( [], { 'encodingStyle:arrayType' => 'cwmp:ParameterValueStruct['.(scalar keys %$params).']' },
 				map {
 					$X->ParameterValueStruct( [],
 						$X->Name( [], $_ ),
@@ -146,7 +146,7 @@ sub GetParameterValues {
 		my ( $X, $state ) = @_;
 
 		$X->GetParameterValues( $cwmp,
-			$X->ParameterNames( { 'soap:arrayType' => 'xsd:string[' . ( $#ParameterNames + 1 ) . ']' },
+			$X->ParameterNames( { 'encodingStyle:arrayType' => 'xsd:string[' . ( $#ParameterNames + 1 ) . ']' },
 				map {
 					$X->string( $_ )
 				} @ParameterNames
@@ -172,8 +172,8 @@ sub GetParameterNames {
 		my ( $X, $state ) = @_;
 
 		$X->GetParameterNames( $cwmp,
-			$X->ParameterPath( $cwmp, $ParameterPath ),
-			$X->NextLevel( $cwmp, $NextLevel ),
+			$X->ParameterPath( $ParameterPath ),
+			$X->NextLevel( $NextLevel ),
 		);
 	});
 }
@@ -194,9 +194,9 @@ sub GetParameterAttributes {
 		my ( $X, $state ) = @_;
 
 		$X->GetParameterAttributes( $cwmp,
-			$X->ParameterNames( $cwmp,
+			$X->ParameterNames( [], { 'encodingStyle:arrayType' => 'cwmp:ParameterNameStruct['.(scalar @ParameterNames).']' },
 				map {
-					$X->string( $xsd, $_ )
+					$X->string( $_ )
 				} @ParameterNames
 			)
 		);
@@ -246,7 +246,7 @@ sub InformResponse {
 	$self->xml( $state, sub {
 		my ( $X, $state ) = @_;
 		$X->InformResponse( $cwmp,
-			$X->MaxEnvelopes( $cwmp, 1 )
+			$X->MaxEnvelopes( 1 )
 		);
 	});
 }

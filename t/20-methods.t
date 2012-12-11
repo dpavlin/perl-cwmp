@@ -37,6 +37,9 @@ sub check_method {
 	if ( ! -e $file ) {
 		diag "creating $file";
 		write_file( $file, $xml );
+		my $lint = "xmllint --schema http://www.broadband-forum.org/cwmp/cwmp-1-0.xsd $file";
+		diag $lint;
+		system($lint) == 0 || die "failed";
 	}
 
 	my $template_xml = read_file( $file ) || die "can't read template xml $file: $!";
