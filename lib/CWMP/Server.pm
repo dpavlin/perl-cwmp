@@ -88,20 +88,27 @@ sub run {
 	) || die "can't start server on ", $self->port, ": $!";
 
 	warn "ACS waiting for request on port ", $self->port, "\n";
+	
+	$SIG{CHLD}='IGNORE'; # Ignore the responding forks
 
 	while (1) {
 		my $client = $server->accept() || next; # ALARM trickle us
 
-		my $count = 0;
+		if (fork()==0) {
+			my $count = 0;
 
-		my $session = CWMP::Session->new( $self->session ) || confess "can't create sessision";
+			my $session = CWMP::Session->new( $self->session ) || confess "can't create sessision";
 
-		while ( $self->sock_session( $client, $session ) ) {
-			$count++;
-			warn "# finished request $count, waiting for next one\n";
+			while ( $self->sock_session( $client, $session ) ) {
+				$count++;
+				warn "# finished request ", $client->peerhost ," $count, waiting for next one\n";
+			}
+
+			warn "# connection to ", $client->peerhost, " closed\n";
+			$client->close();
+			exit(1);
 		}
-
-		warn "# connection to ", $client->peerhost, " closed\n";
+		$client->close();
 	}
 
 }
