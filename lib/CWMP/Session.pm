@@ -132,7 +132,8 @@ sub process_request {
 		$job->finish;
 	} else {
 		my @dispatch;
-		@dispatch = CWMP::Vendor->all_parameters( $self->store, $uid, $queue );
+		# @dispatch = CWMP::Vendor->all_parameters( $self->store, $uid, $queue );
+		@dispatch = CWMP::Vendor->some_parameters( $self->store, $uid, $queue );
 warn "XXX", dump @dispatch;
 		@dispatch = CWMP::Vendor->vendor_config( $self->store, $uid, $queue ) unless @dispatch;
 warn "XXX", dump @dispatch;

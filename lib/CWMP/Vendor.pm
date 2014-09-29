@@ -71,6 +71,24 @@ sub all_parameters {
 
 our $tried;
 
+sub some_parameters {
+	my ( $self, $store, $uid, $queue ) = @_;
+
+	my $stored = $store->get_state( $uid );
+
+	my $vendor = YAML::LoadFile 'param.yaml';
+
+	$vendor = $vendor->{Parameter} || die  "no Parameter in param.yaml";
+
+	foreach my $n ( keys %$vendor ) {
+		printf "We are getting value for $n\n";
+		$queue->enqueue( 'GetParameterValues', [ $n ] );	# refresh after change		
+	}
+	
+	return ( 'GetParameterNames', [ 'InternetGatewayDevice.DeviceInfo.',1] ) if ! defined $stored->{ParameterInfo};
+	return;
+}
+
 sub vendor_config {
 	my ( $self, $store, $uid, $queue ) = @_;
 
@@ -91,7 +109,16 @@ sub vendor_config {
 		} elsif ( $vendor->{$n} ne $stored->{$n}
 			&& ( ! $tried->{$uid}->{$n}->{set} || $tried->{$uid}->{$n}->{set} ne $vendor->{$n} )
 		) {
-			$queue->enqueue( 'SetParameterValues', { $n => $vendor->{$n} } );
+			my $value = $vendor->{$n};
+			if ($stored) {
+			  while(
+			    $value=~ s/\$\{([^\}]+)\}/$stored->{$1}/gei
+			    or
+			    $value=~ s/\$\[([^\]]+)\]/eval($1)/gei
+			  ) {};
+			}
+			warn "# set value to $n to be $value\n";
+			$queue->enqueue( 'SetParameterValues', { $n => $value } );
 			$queue->enqueue( 'GetParameterValues', [ $n ] );	# refresh after change
 			push @refresh, $n;
 			$tried->{$uid}->{$n}->{set} = $vendor->{$n};
