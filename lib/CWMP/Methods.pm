@@ -40,8 +40,18 @@ For examples, see source of this module.
 =cut
 
 my $cwmp = [ cwmp => 'urn:dslforum-org:cwmp-1-0' ];
-my $soap = [ soap => 'http://schemas.xmlsoap.org/soap/envelope/', 'encodingStyle' => "http://schemas.xmlsoap.org/soap/encoding/" ];
+#my $soap = [ soap => 'http://schemas.xmlsoap.org/soap/envelope/', 'encodingStyle' => "http://schemas.xmlsoap.org/soap/encoding/" ];
+my $soap = [ "SOAP-ENV" => "http://schemas.xmlsoap.org/soap/envelope/", "SOAP_ENC"=> "http://schemas.xmlsoap.org/soap/encoding/", xsd=>"http://www.w3.org/2001/XMLSchema", xsi=>"http://www.w3.org/2001/XMLSchema-instance" ];
 my $xsd  = [ xsd  => 'http://www.w3.org/2001/XMLSchema-instance' ];
+
+#     xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+#     xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+#     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+#     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+#     xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+#     xmlns:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            
 
 sub xml {
 	my $self = shift;
@@ -57,7 +67,7 @@ sub xml {
 
 	my @header;
 	push( @header, $X->ID( $cwmp, { 'soap:mustUnderstand' => 1 }, $state->{ID} )) if $state->{ID};
-	push( @header, $X->NoMoreRequests( $cwmp, $state->{NoMoreRequests} || 0 ));
+	# push( @header, $X->NoMoreRequests( $cwmp, $state->{NoMoreRequests} || 0 ));
 
 	return $X->Envelope( $soap,
 		$X->Header( $soap, @header ),
@@ -112,13 +122,22 @@ sub SetParameterValues {
 		$X->SetParameterValues( $cwmp,
 			$X->ParameterList( [], { 'encodingStyle:arrayType' => 'cwmp:ParameterValueStruct['.(scalar keys %$params).']' },
 				map {
+				   if ( $params->{$_}=~ /^\#([^\#]+)\#(.+)$/ ) {
+				        my $type = $1;
+				        my $val  = $2;
 					$X->ParameterValueStruct( [],
 						$X->Name( [], $_ ),
-						$X->Value( [], $params->{$_} )
-					)
+						$X->Value( [], { "xsi:type"=>$1 }, $2 )
+					);
+				   } else {
+					$X->ParameterValueStruct( [],
+						$X->Name( [], $_ ),
+						$X->Value( [], { "xsi:type"=>"xsd:string" }, $params->{$_} )
+					);
+                                   }
 				} sort keys %$params
 			),
-			$X->ParameterKey( '' ),
+			$X->ParameterKey( '' ), # Just for experiment
 		);
 	});
 }
